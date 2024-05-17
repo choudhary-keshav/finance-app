@@ -109,12 +109,10 @@ const ExcelUploader: React.FC = () => {
         transactionFormData.debit,
         transactionFormData.credit,
         transactionFormData.balance,
-        // transactionFormData.category,
       ],
     ];
     setExcelData(updatedExcelData);
 
-    // Reset the form data
     setTransactionFormData({
       transactionDate: "",
       description: "",
@@ -124,7 +122,7 @@ const ExcelUploader: React.FC = () => {
       category: "",
     });
 
-    onClose(); // Close the modal after submitting
+    onClose(); 
   };
 
   const handleSaveData = async () => {
