@@ -2,6 +2,7 @@ import React from "react";
 import { Box, useColorModeValue, useDisclosure } from "@chakra-ui/react";
 import { ProfilePageProps } from "../../interfaces/interface";
 import SidebarWithHeader from "./SidebarWithHeader";
+import AllRoutes from "../../AllRoutes";
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -12,6 +13,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ children }) => {
       <Box ml={{ base: 0, md: 60 }} p="4">
         {children}
       </Box>
+
+      <div style={{ height: 600, width: 800, backgroundColor: "white", marginLeft: 250 }}>
+        <AllRoutes />
+      </div>
     </Box>
   );
 };

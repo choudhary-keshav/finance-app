@@ -1,15 +1,17 @@
 import React from "react";
-import { Box, CloseButton, Flex, useColorModeValue, Text } from "@chakra-ui/react";
-import { FiHome, FiTrendingUp, FiCompass, FiStar, FiSettings} from "react-icons/fi";
-import { LinkItemProps} from "../../interfaces/interface";
+import { Box, CloseButton, Flex, useColorModeValue, Text, Image, Center } from "@chakra-ui/react";
+import {  FiTrendingUp, FiCompass, FiStar, FiSettings } from "react-icons/fi";
+import { LinkItemProps } from "../../interfaces/interface";
 import NavItem from "./NavItem";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import logoImg from "../../assets/images/download-removebg-preview.png"
 
 const LinkItems: Array<LinkItemProps> = [
-  { name: "Home", icon: FiHome },
-  { name: "Upload Excel Sheet", icon: FiTrendingUp },
-  { name: "View Expense", icon: FiCompass },
-  { name: "Analyse Expense", icon: FiStar },
-  { name: "Settings", icon: FiSettings },
+  // { name: "Home", icon: FiHome, to: "/home" },
+  { name: "Upload Excel Sheet", icon: FiTrendingUp, to: "/upload" },
+  { name: "View Expense", icon: FiCompass, to: "/view" },
+  { name: "Analyse Expense", icon: FiStar, to: "/analyse" },
+  { name: "Settings", icon: FiSettings, to: "/settings" },
 ];
 const SidebarContent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   return (
@@ -22,14 +24,14 @@ const SidebarContent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       pos="fixed"
       h="full"
     >
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
+      <Flex h="20" alignItems="center"  justifyContent="space-between">
+        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" margin="auto">
+          <Image borderRadius="cover" boxSize="70px" src={logoImg} alt="logo" align="center" />
         </Text>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
+        <NavItem key={link.name} icon={link.icon} to={link.to}>
           {link.name}
         </NavItem>
       ))}

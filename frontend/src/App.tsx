@@ -1,17 +1,28 @@
-import React from "react";
+  import React from "react";
 import { Route, Routes } from "react-router-dom";
-import HomePage from "./pages/login/Signup/UserAuthentication";
 import ProfilePage from "./pages/HomePage/Profilepage";
-
+import UserAuthentication from "./pages/UserAuthentication/UserAuthentication";
+import { Provider } from "react-redux";
+import { persistor, store } from "./redux/store";
+import { PersistGate } from "redux-persist/integration/react";
+import UserVerification from "./components/UserVerification/userVerification";
 function App() {
   return (
     <div className="App">
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/profile" element={<ProfilePage children={undefined} />} />
-      </Routes>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <Routes>
+            <Route element={<UserVerification />}>
+              <Route path="/*" element={<ProfilePage children={undefined} />} />
+              <Route path="/login" element={<UserAuthentication />} />
+              <Route path="/Signup" element={<UserAuthentication />} />
+            </Route>
+          </Routes>
+        </PersistGate>
+      </Provider>
     </div>
   );
 }
-
+ 
 export default App;
+ 

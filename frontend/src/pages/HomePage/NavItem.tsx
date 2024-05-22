@@ -1,10 +1,11 @@
 import React from "react";
-import { Flex, Icon, Link } from "@chakra-ui/react";
+import { Flex, Icon } from "@chakra-ui/react";
 import { NavItemProps } from "../../interfaces/interface";
+import { Link } from "react-router-dom";
 
-const NavItem: React.FC<NavItemProps> = ({ icon, children }) => {
+const NavItem: React.FC<NavItemProps> = ({ icon, children, to }) => {
   return (
-    <Link href="#" style={{ textDecoration: "none" }} _focus={{ boxShadow: "none" }}>
+    <Link to={to} style={{ textDecoration: "none" }}>
       <Flex
         align="center"
         p="4"

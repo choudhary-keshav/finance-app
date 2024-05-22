@@ -1,9 +1,9 @@
 import { Box, Container, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import React from "react";
-import Login from "../../../components/Authentication/Login";
-import Signup from "../../../components/Authentication/Signup";
-
-const Homepage = () => {
+import Login from "../../components/Authentication/Login";
+import Signup from "../../components/Authentication/Signup";
+import { Link } from "react-router-dom";
+const UserAuthentication = () => {
   return (
     <Container maxW="xl" centerContent>
       <Box
@@ -23,8 +23,12 @@ const Homepage = () => {
       <Box bg="white" w="100%" p={4} borderRadius="lg" borderWidth="1px">
         <Tabs isFitted variant="soft-rounded">
           <TabList mb="1em">
-            <Tab>Login</Tab>
-            <Tab>Sign Up</Tab>
+            <Link to="/login">
+              <Tab>Login</Tab>
+            </Link>
+            <Link to="/Signup">
+              <Tab>Signup</Tab>
+            </Link>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -40,4 +44,4 @@ const Homepage = () => {
   );
 };
 
-export default Homepage;
+export default UserAuthentication;

@@ -1,16 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {
-  FormControl,
-  FormLabel,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Button,
-  VStack,
-} from "@chakra-ui/react";
+import { FormControl, FormLabel, Input, InputGroup, InputRightElement, Button, VStack } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/react";
+import { setUser } from "../../redux/features/authenticationSlice";
+import { useDispatch } from "react-redux";
+import { useSignupMutation } from "../../redux/services/authApi";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -19,8 +14,9 @@ const Signup = () => {
   const [confirmpassword, setConfirmpassword] = useState("");
   const [show, setShow] = useState(false);
   const toast = useToast();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [createNewUser] = useSignupMutation();
 
   const submitHandler = async () => {
     if (!name || !email || !password || !confirmpassword) {
@@ -43,23 +39,8 @@ const Signup = () => {
       });
       return;
     }
-    console.log(name, email, password);
     try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-      const { data } = await axios.post(
-        "http://localhost:5000/api/user/register",
-        {
-          name,
-          email,
-          password,
-        },
-        config
-      );
-      console.log(data);
+      const data = await createNewUser({ name, email, password });
       toast({
         title: "Registration Successful",
         status: "success",
@@ -67,9 +48,10 @@ const Signup = () => {
         isClosable: true,
         position: "bottom",
       });
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      navigate("/profile");
-    } catch (error:any) {
+      // dispatch(setUser(data));
+      localStorage.setItem("token", JSON.stringify(data?.data?.token));
+      navigate("/");
+    } catch (error: any) {
       toast({
         title: "Error Occured!",
         description: error.response.data.message,
@@ -85,20 +67,11 @@ const Signup = () => {
     <VStack spacing="10px">
       <FormControl isRequired>
         <FormLabel>Name</FormLabel>
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter Full Name"
-        />
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter Full Name" />
       </FormControl>
       <FormControl isRequired>
         <FormLabel>Email</FormLabel>
-        <Input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter Email"
-        />
+        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter Email" />
       </FormControl>
       <FormControl isRequired>
         <FormLabel>Password</FormLabel>
@@ -134,12 +107,7 @@ const Signup = () => {
           </InputRightElement>
         </InputGroup>
       </FormControl>
-      <Button
-        colorScheme="blue"
-        width="50%"
-        style={{ marginTop: 15 }}
-        onClick={submitHandler}
-      >
+      <Button colorScheme="blue" width="50%" style={{ marginTop: 15 }} onClick={submitHandler}>
         Sign Up
       </Button>
     </VStack>

@@ -1,24 +1,19 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {
-  FormControl,
-  FormLabel,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Button,
-  VStack,
-} from "@chakra-ui/react";
+import { FormControl, FormLabel, Input, InputGroup, InputRightElement, Button, VStack } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/react";
+import { setUser } from "../../redux/features/authenticationSlice";
+import { useDispatch } from "react-redux";
+import { useLoginMutation } from "../../redux/services/authApi";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const toast = useToast();
-  const navigate=useNavigate();
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [createUser] = useLoginMutation();
   const submitHandler = async () => {
     if (!email || !password) {
       toast({
@@ -32,19 +27,7 @@ const Login = () => {
     }
 
     try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-
-      const { data } = await axios.post(
-        "http://localhost:5000/api/user/login",
-        { email, password },
-        config
-      );
-      console.log(data)
-
+      const data = await createUser({ email, password });
       toast({
         title: "Login Successful",
         status: "success",
@@ -52,10 +35,10 @@ const Login = () => {
         isClosable: true,
         position: "bottom",
       });
-      // setUser(data);
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      navigate("/profile");
-    } catch (error:any) {
+      dispatch(setUser(data));
+      localStorage.setItem("token", JSON.stringify(data?.data?.token));
+      navigate("/");
+    } catch (error: any) {
       toast({
         title: "Error Occured!",
         description: error.response.data.message,
@@ -67,18 +50,11 @@ const Login = () => {
     }
   };
 
-
-
   return (
     <VStack spacing="10px">
       <FormControl isRequired>
         <FormLabel>Email</FormLabel>
-        <Input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter Email"
-        />
+        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter Email" />
       </FormControl>
       <FormControl isRequired>
         <FormLabel>Password</FormLabel>
@@ -97,12 +73,7 @@ const Login = () => {
           </InputRightElement>
         </InputGroup>
       </FormControl>
-      <Button
-        colorScheme="blue"
-        width="50%"
-        style={{ marginTop: 15 }}
-        onClick={submitHandler}
-      >
+      <Button colorScheme="blue" width="50%" style={{ marginTop: 15 }} onClick={submitHandler}>
         Login
       </Button>
     </VStack>
