@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import  {User as UserModel}  from '../models/userModel';
+const { User } = require('../models/userModel');
 import { TransactionModel } from '../models/transactionModel';
 
 const saveExcelData = async (req: Request, res: Response) => {
@@ -37,7 +37,7 @@ const saveExcelData = async (req: Request, res: Response) => {
       await newTransaction.save();
       const transactionId = newTransaction._id;
 
-      await UserModel.findByIdAndUpdate(userId, {
+      await User.findByIdAndUpdate(userId, {
         $push: { transactions: transactionId },
       });
     }
