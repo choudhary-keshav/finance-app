@@ -1,26 +1,26 @@
-import mongoose from "mongoose";
-const bcrypt = require("bcryptjs")
+import mongoose from 'mongoose';
+const bcrypt = require('bcryptjs');
 
 const userModel = new mongoose.Schema(
   {
-    name: { type: "String", required: true },
-    email: { type: "String", unique: true, required: true },
-    password: { type: "String", required: true },
+    name: { type: 'String', required: true },
+    email: { type: 'String', unique: true, required: true },
+    password: { type: 'String', required: true },
     pic: {
-      type: "String",
+      type: 'String',
       required: true,
       default:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+        'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg',
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-userModel.methods.matchPassword = async function (enteredPassword:any) {
+userModel.methods.matchPassword = async function (enteredPassword: any) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userModel.pre("save", async function (next) {
+userModel.pre('save', async function (next) {
   if (!this.isModified) {
     next();
   }
@@ -29,6 +29,5 @@ userModel.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-const User = mongoose.model("User", userModel);
+export const User = mongoose.model('User', userModel);
 
-module.exports = User;

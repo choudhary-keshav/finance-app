@@ -73,15 +73,7 @@ const Signup = () => {
 
     try {
       const data = await createNewUser({ name, email, password });
-      if (data.error) {
-        showNotification(
-          isFetchBaseQueryError(data.error) && data.error.data && hasMessage(data.error.data)
-            ? data.error.data.message
-            : "An error occured",
-          "warning"
-        );
-        return;
-      }
+      console.log(data);
       toast({
         title: "Registration Successful",
         status: "success",

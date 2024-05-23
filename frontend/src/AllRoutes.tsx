@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { Settings } from "./components/SettingsComponent/Settings";
-import { UploadExcel } from "./components/UploadComponent/UploadExcel";
+import  UploadExcel  from "./components/UploadComponent/UploadExcel";
 import { AnalyseExpense } from "./components/AnalyseExpenseComponent/AnalyseExpense";
 import { ViewExpense } from "./components/ViewExpenseComponent/ViewExpense";
 
