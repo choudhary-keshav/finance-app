@@ -1,4 +1,4 @@
-  import React from "react";
+import React from "react";
 import { Route, Routes } from "react-router-dom";
 import ProfilePage from "./pages/HomePage/Profilepage";
 import UserAuthentication from "./pages/UserAuthentication/UserAuthentication";
@@ -12,10 +12,10 @@ function App() {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <Routes>
+            <Route path="/login" element={<UserAuthentication />} />
+            <Route path="/Signup" element={<UserAuthentication />} />
             <Route element={<UserVerification />}>
               <Route path="/*" element={<ProfilePage children={undefined} />} />
-              <Route path="/login" element={<UserAuthentication />} />
-              <Route path="/Signup" element={<UserAuthentication />} />
             </Route>
           </Routes>
         </PersistGate>
@@ -23,6 +23,5 @@ function App() {
     </div>
   );
 }
- 
+
 export default App;
- 

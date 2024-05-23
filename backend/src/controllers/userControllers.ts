@@ -14,7 +14,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const userExists = await User.findOne({ email });
 
   if (userExists) {
-    res.status(400);
+    res.status(409);
     throw new Error('User already exists');
   }
 
@@ -35,17 +35,19 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
       token: generateToken(user),
     });
   } else {
-    res.status(400);
-    throw new Error('User not found');
+    res.status(500);
+    throw new Error('Could not create user');
   }
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
   const user = await User.findOne({ email });
-
-  if (user && (await user.matchPassword(password))) {
+  if (!user) {
+    res.status(404);
+    throw new Error('User Does Not Exist');
+  }
+  if (await user.matchPassword(password)) {
     res.json({
       _id: user._id,
       name: user.name,
@@ -56,9 +58,8 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     });
   } else {
     res.status(401);
-    throw new Error('Invalid Email or Password');
+    throw new Error('Invalid Email Password Combination');
   }
 });
-
 
 module.exports = { registerUser, loginUser };

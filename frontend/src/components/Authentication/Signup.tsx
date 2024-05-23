@@ -5,6 +5,7 @@ import { useToast } from "@chakra-ui/react";
 import { setUser } from "../../redux/features/authenticationSlice";
 import { useDispatch } from "react-redux";
 import { useSignupMutation } from "../../redux/services/authApi";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -16,30 +17,71 @@ const Signup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [createNewUser] = useSignupMutation();
+  const passwordRegex = /(?=.*[!@#\$%\^\&*\)\(+=._-])/g;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const showNotification = (
+    title: string,
+    status: "error" | "info" | "warning" | "success" | "loading" | undefined
+  ) => {
+    toast({
+      title,
+      status,
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+  };
+
+  const isFetchBaseQueryError = (error: any): error is FetchBaseQueryError => {
+    return error && typeof error === "object" && "status" in error;
+  };
+
+  const hasMessage = (error: any): error is { message: string } => {
+    return error && typeof error === "object" && "message" in error;
+  };
 
   const submitHandler = async () => {
     if (!name || !email || !password || !confirmpassword) {
-      toast({
-        title: "Please Fill all the Feilds",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
+      showNotification("Please Fill all the Fields", "warning");
+      return;
+    }
+    if (name.length > 60) {
+      showNotification("Name cannot be longer than 60 characters", "warning");
+      return;
+    }
+    if (email.length > 320) {
+      showNotification("Email cannot be longer than 320 characters", "warning");
+      return;
+    }
+    if (!email.match(emailRegex)) {
+      showNotification("Email must be a valid address", "warning");
       return;
     }
     if (password !== confirmpassword) {
-      toast({
-        title: "Passwords Do Not Match",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
+      showNotification("Passwords Do Not Match", "warning");
       return;
     }
+    if (password.length < 8 || password.length > 60) {
+      showNotification("Password length must be between 8 and 60", "warning");
+      return;
+    }
+    if (!password.match(passwordRegex)) {
+      showNotification("Password must contain atleast one special character", "warning");
+      return;
+    }
+
     try {
       const data = await createNewUser({ name, email, password });
+      if (data.error) {
+        showNotification(
+          isFetchBaseQueryError(data.error) && data.error.data && hasMessage(data.error.data)
+            ? data.error.data.message
+            : "An error occured",
+          "warning"
+        );
+        return;
+      }
       toast({
         title: "Registration Successful",
         status: "success",

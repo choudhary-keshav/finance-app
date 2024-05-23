@@ -5,6 +5,7 @@ import { useToast } from "@chakra-ui/react";
 import { setUser } from "../../redux/features/authenticationSlice";
 import { useDispatch } from "react-redux";
 import { useLoginMutation } from "../../redux/services/authApi";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,6 +15,28 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [createUser] = useLoginMutation();
+
+  const showNotification = (
+    title: string,
+    status: "error" | "info" | "warning" | "success" | "loading" | undefined
+  ) => {
+    toast({
+      title,
+      status,
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+  };
+
+  const isFetchBaseQueryError = (error: any): error is FetchBaseQueryError => {
+    return error && typeof error === "object" && "status" in error;
+  };
+
+  const hasMessage = (error: any): error is { message: string } => {
+    return error && typeof error === "object" && "message" in error;
+  };
+
   const submitHandler = async () => {
     if (!email || !password) {
       toast({
@@ -28,6 +51,15 @@ const Login = () => {
 
     try {
       const data = await createUser({ email, password });
+      if (data.error) {
+        showNotification(
+          isFetchBaseQueryError(data.error) && data.error.data && hasMessage(data.error.data)
+            ? data.error.data.message
+            : "An error occured",
+          "warning"
+        );
+        return;
+      }
       toast({
         title: "Login Successful",
         status: "success",
