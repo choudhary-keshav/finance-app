@@ -70,10 +70,19 @@ const Signup = () => {
       showNotification("Password must contain atleast one special character", "warning");
       return;
     }
-
+    
     try {
       const data = await createNewUser({ name, email, password });
       console.log(data);
+      if (data.error) {
+        showNotification(
+          isFetchBaseQueryError(data.error) && data.error.data && hasMessage(data.error.data)
+            ? data.error.data.message
+            : "An error occured",
+          "warning"
+        );
+        return;
+      }
       toast({
         title: "Registration Successful",
         status: "success",
