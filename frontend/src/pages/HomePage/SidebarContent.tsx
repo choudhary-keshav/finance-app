@@ -1,9 +1,8 @@
 import React from "react";
-import { Box, CloseButton, Flex, useColorModeValue, Text, Image, Center } from "@chakra-ui/react";
+import { Box, CloseButton, Flex, useColorModeValue, Text, Image } from "@chakra-ui/react";
 import {  FiTrendingUp, FiCompass, FiStar, FiSettings } from "react-icons/fi";
 import { LinkItemProps } from "../../interfaces/interface";
 import NavItem from "./NavItem";
-import { BrowserRouter as Router, Route } from "react-router-dom";
 import logoImg from "../../assets/images/download-removebg-preview.png"
 
 const LinkItems: Array<LinkItemProps> = [

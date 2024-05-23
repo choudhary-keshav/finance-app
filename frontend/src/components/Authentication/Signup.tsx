@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FormControl, FormLabel, Input, InputGroup, InputRightElement, Button, VStack } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/react";
@@ -48,9 +47,9 @@ const Signup = () => {
         isClosable: true,
         position: "bottom",
       });
-      // dispatch(setUser(data));
+      dispatch(setUser(data));
       localStorage.setItem("token", JSON.stringify(data?.data?.token));
-      navigate("/");
+      navigate("/", { state: data?.data?.token });
     } catch (error: any) {
       toast({
         title: "Error Occured!",
