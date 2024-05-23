@@ -10,7 +10,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     res.status(400);
     throw new Error('Please Enter all the Feilds');
   }
-
   const userExists = await User.findOne({ email });
 
   if (userExists) {
@@ -42,7 +41,9 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
+  console.log({email});
   const user = await User.findOne({ email });
+
   if (!user) {
     res.status(404);
     throw new Error('User Does Not Exist');
