@@ -7,10 +7,10 @@ import logoImg from "../../assets/images/download-removebg-preview.png"
 
 const LinkItems: Array<LinkItemProps> = [
   // { name: "Home", icon: FiHome, to: "/home" },
+  { name: "Dashboard", icon: FiSettings, to: "/dashboard" },
   { name: "Upload Excel Sheet", icon: FiTrendingUp, to: "/upload" },
   { name: "View Expense", icon: FiCompass, to: "/view" },
   { name: "Analyse Expense", icon: FiStar, to: "/analyse" },
-  { name: "Settings", icon: FiSettings, to: "/settings" },
 ];
 const SidebarContent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   return (

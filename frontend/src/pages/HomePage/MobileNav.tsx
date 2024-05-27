@@ -27,9 +27,7 @@ const MobileNav: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
   const navigate = useNavigate();
   const logoutHandler = async () => {
     localStorage.removeItem("token");
-    console.log("ritika");
     navigate("/login");
-
     onClose();
   };
   return (
@@ -55,7 +53,6 @@ const MobileNav: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
         <Text display={{ base: "flex", md: "none" }} fontSize="2xl" fontFamily="monospace" fontWeight="bold"></Text>
 
         <HStack spacing={{ base: "0", md: "6" }}>
-          <IconButton size="lg" variant="ghost" aria-label="open menu" icon={<FiBell />} />
           <Flex alignItems={"center"}>
             <Menu>
               <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: "none" }}>

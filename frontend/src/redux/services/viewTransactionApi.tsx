@@ -7,7 +7,6 @@ export const transactionApi = createApi({
     baseUrl: "http://localhost:5000/api",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
-      console.log(token);
       if (token) {
         headers.set("Authorization", `Bearer ${token.replace(/^"|"$/g, "")}`);
       }
@@ -28,7 +27,7 @@ export const transactionApi = createApi({
         if (period) params.append("period", period);
         if (customPeriodStart) params.append("customPeriodStart", customPeriodStart);
         if (customPeriodEnd) params.append("customPeriodEnd", customPeriodEnd);
-        console.log(params);
+       
         return {
           url: `/getTransactions?${params.toString()}`,
           method: "GET",

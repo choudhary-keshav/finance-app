@@ -4,13 +4,17 @@ import { Select } from "@chakra-ui/react";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
 import { Transaction } from "../../interfaces/interface";
 import { Radio, RadioGroup } from "@chakra-ui/react";
+// import Pagination from "@mui/material/Pagination";
+// import Stack as stackMui from "@mui/material/Stack";
 
 export const ViewExpense = () => {
-  const [selectedOption, setSelectedOption] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedOption, setSelectedOption] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedTransactionType, setSelectedTransactionType] = useState<boolean | undefined>(undefined);
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+  
+  
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -32,6 +36,8 @@ export const ViewExpense = () => {
   useEffect(() => {
     trigger(queryParams);
   }, [selectedOption, selectedCategory, selectedTransactionType, fromDate, toDate]);
+ 
+  
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -90,7 +96,7 @@ export const ViewExpense = () => {
       </div>
 
       <TableContainer>
-        <Table variant="simple">
+        <Table variant="simple" size="lg">
           <TableCaption>Transactions made with this user account</TableCaption>
           <Thead>
             <Tr>
@@ -116,6 +122,10 @@ export const ViewExpense = () => {
               ))}
           </Tbody>
         </Table>
+        <nav>
+
+        </nav>
+        
       </TableContainer>
     </>
   );
