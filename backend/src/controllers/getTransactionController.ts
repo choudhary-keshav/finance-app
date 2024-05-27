@@ -11,20 +11,16 @@ export const getTransactions = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'User ID is required' });
   }
 
-
   const pipeline: any[] = [];
   let matchStage: any = { userId: new mongoose.Types.ObjectId(userId) };
   pipeline.push({ $match: matchStage });
   pipeline.push({ $unwind: '$transactions' });
   matchStage = {};
 
-
   if (category) {
     matchStage['transactions.category'] = category;
     pipeline.push({ $match: matchStage });
   }
-
-
 
   if (isDebit !== undefined) {
     if (isDebit === 'true') {
@@ -37,8 +33,6 @@ export const getTransactions = async (req: Request, res: Response) => {
       });
     }
   }
-
-
 
   let startDate: Date | undefined;
   let endDate: Date | undefined;
@@ -70,6 +64,10 @@ export const getTransactions = async (req: Request, res: Response) => {
           });
         }
         break;
+      default:
+        startDate = undefined;
+        console.log("default case is running")
+        break;
     }
     let matchDate: any = {
       $gte: startDate,
@@ -97,7 +95,6 @@ export const getTransactions = async (req: Request, res: Response) => {
       );
     }
   }
-
 
   try {
     const transactions = await Transaction.aggregate(pipeline);

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Thead, Tbody, Tr, Th, Td, TableCaption, TableContainer, Stack } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
-import { useViewTransactionQuery } from "../../redux/services/viewTransactionApi";
-import { Transaction, TransactionDetails } from "../../interfaces/interface";
+import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
+import { Transaction } from "../../interfaces/interface";
 import { Radio, RadioGroup } from "@chakra-ui/react";
 
 export const ViewExpense = () => {
@@ -19,7 +19,8 @@ export const ViewExpense = () => {
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
-console.log("ritika", selectedOption);
+
+  const [trigger, { data }] = useLazyViewTransactionQuery();
   const queryParams = {
     period: selectedOption,
     category: selectedCategory,
@@ -28,22 +29,26 @@ console.log("ritika", selectedOption);
     customPeriodEnd: selectedOption === "custom" ? formatDate(toDate) : undefined,
   };
 
-  const { data: transactions, isLoading } = useViewTransactionQuery(queryParams);
-console.log(transactions)
-  const handleSelectChange = (event: any) => {
+  useEffect(() => {
+    trigger(queryParams);
+  }, [selectedOption, selectedCategory, selectedTransactionType, fromDate, toDate]);
+
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
   };
 
-  const handleFromDateChange = (event: any) => {
+  const handleFromDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFromDate(event.target.value);
   };
 
-  const handleToDateChange = (event: any) => {
+  const handleToDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setToDate(event.target.value);
   };
-  const handleCategoryChange = (event: any) => {
+
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(event.target.value);
   };
+
   const handleTransactionTypeChange = (value: string) => {
     if (value === "debit") {
       setSelectedTransactionType(true);
@@ -57,8 +62,7 @@ console.log(transactions)
   return (
     <>
       <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
-        <Select value={selectedOption} onChange={handleSelectChange} placeholder="Select option" width="250px">
-          <option value="">All</option>
+        <Select value={selectedOption} onChange={handleSelectChange} placeholder="All" width="250px">
           <option value="thisWeek">This Week</option>
           <option value="thisMonth">This Month</option>
           <option value="thisYear">This Year</option>
@@ -70,11 +74,10 @@ console.log(transactions)
             <input type="date" placeholder="to" value={toDate} onChange={handleToDateChange} />
           </>
         )}
-        <Select value={selectedCategory} onChange={handleCategoryChange} placeholder="Select categpry" width="250px">
-          <option value="">All</option>
-          <option value="food">food</option>
-          <option value="travel">travel</option>
-          <option value="other">other</option>
+        <Select value={selectedCategory} onChange={handleCategoryChange} placeholder="All" width="250px">
+          <option value="food">Food</option>
+          <option value="travel">Travel</option>
+          <option value="other">Other</option>
         </Select>
 
         <RadioGroup onChange={handleTransactionTypeChange}>
@@ -88,7 +91,7 @@ console.log(transactions)
 
       <TableContainer>
         <Table variant="simple">
-          <TableCaption>Transaction made with this user account</TableCaption>
+          <TableCaption>Transactions made with this user account</TableCaption>
           <Thead>
             <Tr>
               <Th>Transaction Date</Th>
@@ -100,8 +103,8 @@ console.log(transactions)
             </Tr>
           </Thead>
           <Tbody>
-            {transactions &&
-              transactions.map((transaction: Transaction) => (
+            {data &&
+              data.map((transaction: Transaction) => (
                 <Tr>
                   <Td>{transaction.transactions.transactionDate}</Td>
                   <Td>{transaction.transactions.description}</Td>
