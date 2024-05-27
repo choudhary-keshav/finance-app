@@ -7,7 +7,7 @@ import { Dashboard } from "./components/DashboardComponent/Dashboard";
 
 const AllRoutes = () => {
   return (
-    <div className="AllRoutes">
+    <div className="AllRoutes" style={{width:'100%'}}>
       <Routes>
         <Route path="/dashboard" element={<Dashboard/>}/>
         <Route path="/upload" element={<UploadExcel />} />

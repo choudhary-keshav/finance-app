@@ -1,0 +1,17 @@
+.expense-table {
+  width: 100%;
+}
+
+.expense-table th {
+  padding: 12px;
+  text-align: center;
+  width: 20px;
+  border-bottom: 0.5px solid rgb(94, 94, 94);
+}
+
+.expense-table td {
+  padding: 12px;
+  text-align: center;
+  width: 20px;
+  border-bottom: 0.5px solid rgb(203, 203, 203);
+}

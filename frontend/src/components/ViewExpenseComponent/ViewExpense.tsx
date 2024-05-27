@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, TableCaption, TableContainer, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
 import { Transaction } from "../../interfaces/interface";
 import { Radio, RadioGroup } from "@chakra-ui/react";
+import './ViewExpense.styled.css'
 // import Pagination from "@mui/material/Pagination";
 // import Stack as stackMui from "@mui/material/Stack";
 
@@ -13,8 +14,6 @@ export const ViewExpense = () => {
   const [selectedTransactionType, setSelectedTransactionType] = useState<boolean | undefined>(undefined);
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
-  
-  
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -36,8 +35,6 @@ export const ViewExpense = () => {
   useEffect(() => {
     trigger(queryParams);
   }, [selectedOption, selectedCategory, selectedTransactionType, fromDate, toDate]);
- 
-  
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -66,8 +63,8 @@ export const ViewExpense = () => {
   };
 
   return (
-    <>
-      <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+    <div style={{ width: "100%", borderRadius: 10, padding: 10 }}>
+      <div style={{ display: "flex", gap: "20px", marginBottom: "20px", alignItems: "center" }}>
         <Select value={selectedOption} onChange={handleSelectChange} placeholder="All" width="250px">
           <option value="thisWeek">This Week</option>
           <option value="thisMonth">This Month</option>
@@ -85,7 +82,6 @@ export const ViewExpense = () => {
           <option value="travel">Travel</option>
           <option value="other">Other</option>
         </Select>
-
         <RadioGroup onChange={handleTransactionTypeChange}>
           <Stack direction="row">
             <Radio value="debit">Debit</Radio>
@@ -94,39 +90,34 @@ export const ViewExpense = () => {
           </Stack>
         </RadioGroup>
       </div>
-
-      <TableContainer>
-        <Table variant="simple" size="lg">
-          <TableCaption>Transactions made with this user account</TableCaption>
-          <Thead>
-            <Tr>
-              <Th>Transaction Date</Th>
-              <Th>Description</Th>
-              <Th>Debit</Th>
-              <Th>Credit</Th>
-              <Th>Balance</Th>
-              <Th>Category</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
+      <div style={{ width: "100%", padding: 15 }}>
+        <table className="expense-table">
+          <thead>
+            <tr>
+              <th>Transaction Date</th>
+              <th>Description</th>
+              <th>Debit</th>
+              <th>Credit</th>
+              <th>Balance</th>
+              <th>Category</th>
+            </tr>
+          </thead>
+          <tbody>
             {data &&
               data.map((transaction: Transaction) => (
-                <Tr>
-                  <Td>{transaction.transactions.transactionDate}</Td>
-                  <Td>{transaction.transactions.description}</Td>
-                  <Td>{transaction.transactions.debit}</Td>
-                  <Td>{transaction.transactions.credit}</Td>
-                  <Td>{transaction.transactions.balance}</Td>
-                  <Td>{transaction.transactions.category}</Td>
-                </Tr>
+                <tr>
+                  <td>{transaction.transactions.transactionDate}</td>
+                  <td>{transaction.transactions.description}</td>
+                  <td>{transaction.transactions.debit}</td>
+                  <td>{transaction.transactions.credit}</td>
+                  <td>{transaction.transactions.balance}</td>
+                  <td>{transaction.transactions.category}</td>
+                </tr>
               ))}
-          </Tbody>
-        </Table>
-        <nav>
-
-        </nav>
-        
-      </TableContainer>
-    </>
+          </tbody>
+        </table>
+        <nav></nav>
+      </div>
+    </div>
   );
 };

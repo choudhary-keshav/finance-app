@@ -12,7 +12,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ children }) => {
       <SidebarWithHeader onClose={onClose} isOpen={isOpen} onOpen={onOpen} />
       <Box ml={{ base: 0, md: 20 }} p="1">
         {children}
-        <div style={{ height: 900, width: 1600, backgroundColor: "white", marginLeft: 250 }}>
+        <div style={{ height: 900, width: '88%', backgroundColor: "white", marginLeft: 180 }}>
           <AllRoutes />
         </div>
       </Box>
