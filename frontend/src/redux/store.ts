@@ -3,7 +3,8 @@ import authenticationReducer from "./features/authenticationSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { authApi } from "./services/authApi";
-const rootreducer = combineReducers({ authentication: authenticationReducer, [authApi.reducerPath]: authApi.reducer });
+import { transactionApi } from "./services/viewTransactionApi";
+const rootreducer = combineReducers({ authentication: authenticationReducer, [authApi.reducerPath]: authApi.reducer, [transactionApi.reducerPath]:transactionApi.reducer });
 
 const persistConfig = {
   key: "root",
@@ -19,7 +20,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: ["persist/PERSIST"],
       },
-    }).concat(authApi.middleware),
+    }).concat(authApi.middleware, transactionApi.middleware),
 });
 export const persistor = persistStore(store);
 export type RootState = ReturnType<typeof store.getState>;

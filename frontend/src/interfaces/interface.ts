@@ -46,3 +46,21 @@ export interface generateTokenPayload {
   email: string;
   pic: string;
 }
+
+// interfaces/interface.ts
+export interface TransactionDetails {
+  transactionDate: string;
+  description: string;
+  debit: string;
+  credit: string;
+  balance: string;
+  category: string;
+  _id: string;
+}
+
+export interface Transaction {
+  _id: string;
+  userId: string;
+  transactions: TransactionDetails;
+  __v: number;
+}

@@ -13,9 +13,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ children }) => {
       <Box ml={{ base: 0, md: 60 }} p="4">
         {children}
       </Box>
-
-      <div style={{ height: 600, width: 800, backgroundColor: "white", marginLeft: 250 }}>
-        <AllRoutes />
+      <div style={{ height: 700, width: 1500, backgroundColor: "white", marginLeft: 250 }}>
+       <AllRoutes />
       </div>
     </Box>
   );

@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-interface TransactionModel {
+ interface TransactionModel {
   transactionDate: Date;
   description: string;
   debit: number;
