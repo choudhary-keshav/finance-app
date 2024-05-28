@@ -1,9 +1,18 @@
 import { Request, Response } from 'express';
 import { TransactionModel as Transaction } from '../models/transactionModel';
 import mongoose from 'mongoose';
+
+
 export const getTransactions = async (req: Request, res: Response) => {
-  const { category, isDebit, period, customPeriodStart, customPeriodEnd } =
-    req.query;
+  const {
+    category,
+    isDebit,
+    period,
+    customPeriodStart,
+    customPeriodEnd,
+    page = 1,
+    limit = 10,
+  } = req.query;
   const user = req.body.user.payload;
   const userId: string = user._id;
 
@@ -36,11 +45,13 @@ export const getTransactions = async (req: Request, res: Response) => {
 
   let startDate: Date | undefined;
   let endDate: Date | undefined;
+
   const parseDate = (dateStr: string): Date => {
     const trimmedDateStr = dateStr.trim();
     const [day, month, year] = trimmedDateStr.split('-').map(Number);
     return new Date(year, month - 1, day);
   };
+
   if (period || (customPeriodStart && customPeriodEnd)) {
     const now = new Date();
 
@@ -66,7 +77,7 @@ export const getTransactions = async (req: Request, res: Response) => {
         break;
       default:
         startDate = undefined;
-        console.log("default case is running")
+        console.log('default case is running');
         break;
     }
     let matchDate: any = {
@@ -79,7 +90,7 @@ export const getTransactions = async (req: Request, res: Response) => {
       pipeline.push(
         {
           $addFields: {
-            'transactions.transactionDate': {
+            'transactions.dateString': {
               $dateFromString: {
                 dateString: '$transactions.transactionDate',
                 format: '%d-%m-%Y',
@@ -89,16 +100,37 @@ export const getTransactions = async (req: Request, res: Response) => {
         },
         {
           $match: {
-            'transactions.transactionDate': matchDate,
+            'transactions.dateString': matchDate,
           },
         },
       );
     }
   }
 
+  const skip = (Number(page) - 1) * Number(limit);
+
+  pipeline.push({
+    $facet: {
+      totalData: [{ $skip: skip }, { $limit: Number(limit) }],
+      
+      totalCount: [{ $count: 'count' }],
+    },
+  });
+ 
+console.log(pipeline)
   try {
-    const transactions = await Transaction.aggregate(pipeline);
-    res.status(200).json(transactions);
+    const result = await Transaction.aggregate(pipeline);
+    const transactions = result[0].totalData;
+    const totalCount = result[0].totalCount[0]?.count || 0;
+    const totalPages = Math.ceil(totalCount / Number(limit));
+
+    res.status(200).json({
+      transactions,
+      totalCount,
+      totalPages,
+      currentPage: Number(page),
+    });
+   
   } catch (error) {
     console.error('Error fetching transactions:', error);
     res.status(500).json({ message: 'Internal server error' });

@@ -18,16 +18,17 @@ export const transactionApi = createApi({
   endpoints: (builder) => ({
     viewTransaction: builder.query<
       Transaction[],
-      { category?: string; isDebit?: boolean; period?: string; customPeriodStart?: string; customPeriodEnd?: string }
+      { category?: string; isDebit?: boolean; period?: string; customPeriodStart?: string; customPeriodEnd?: string,page?:number,limit?:number }
     >({
-      query: ({ category, isDebit, period, customPeriodStart, customPeriodEnd }) => {
+      query: ({ category, isDebit, period, customPeriodStart, customPeriodEnd,page=1,limit=10 }) => {
         const params = new URLSearchParams();
         if (category) params.append("category", category);
         if (isDebit !== undefined) params.append("isDebit", isDebit.toString());
         if (period) params.append("period", period);
         if (customPeriodStart) params.append("customPeriodStart", customPeriodStart);
         if (customPeriodEnd) params.append("customPeriodEnd", customPeriodEnd);
-       
+        params.append("page", page.toString());
+        params.append("limit", limit.toString());
         return {
           url: `/getTransactions?${params.toString()}`,
           method: "GET",

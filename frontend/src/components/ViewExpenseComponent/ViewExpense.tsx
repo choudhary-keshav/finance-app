@@ -3,10 +3,9 @@ import { Stack } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
 import { Transaction } from "../../interfaces/interface";
-import { Radio, RadioGroup } from "@chakra-ui/react";
-import './ViewExpense.styled.css'
-// import Pagination from "@mui/material/Pagination";
-// import Stack as stackMui from "@mui/material/Stack";
+import { Radio, RadioGroup, Button } from "@chakra-ui/react";
+import "./ViewExpense.styled.css";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 
 export const ViewExpense = () => {
   const [selectedOption, setSelectedOption] = useState<string>("");
@@ -14,6 +13,9 @@ export const ViewExpense = () => {
   const [selectedTransactionType, setSelectedTransactionType] = useState<boolean | undefined>(undefined);
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -23,33 +25,47 @@ export const ViewExpense = () => {
     return `${day}-${month}-${year}`;
   };
 
-  const [trigger, { data }] = useLazyViewTransactionQuery();
+  const [trigger] = useLazyViewTransactionQuery();
   const queryParams = {
     period: selectedOption,
     category: selectedCategory,
     isDebit: selectedTransactionType,
     customPeriodStart: selectedOption === "custom" ? formatDate(fromDate) : undefined,
     customPeriodEnd: selectedOption === "custom" ? formatDate(toDate) : undefined,
+    page: currentPage,
+    limit: 10,
   };
 
   useEffect(() => {
-    trigger(queryParams);
-  }, [selectedOption, selectedCategory, selectedTransactionType, fromDate, toDate]);
+    trigger(queryParams).then((response: any) => {
+      if (response.data) {
+        console.log(response.data);
+        setTotalPages(response.data.totalPages);
+        setTransactions(response.data.transactions);
+      }
+    });
+  }, [selectedOption, selectedCategory, selectedTransactionType, fromDate, toDate, currentPage]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
+    setFromDate("");
+    setToDate("");
+    setCurrentPage(1);
   };
 
   const handleFromDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFromDate(event.target.value);
+    setCurrentPage(1);
   };
 
   const handleToDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setToDate(event.target.value);
+    setCurrentPage(1);
   };
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(event.target.value);
+    setCurrentPage(1);
   };
 
   const handleTransactionTypeChange = (value: string) => {
@@ -60,11 +76,17 @@ export const ViewExpense = () => {
     } else {
       setSelectedTransactionType(undefined);
     }
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    console.log("pages", currentPage, totalPages);
   };
 
   return (
-    <div style={{ width: "100%", borderRadius: 10, padding: 10 }}>
-      <div style={{ display: "flex", gap: "20px", marginBottom: "20px", alignItems: "center" }}>
+    <div className="viewExpense-main-container">
+      <div className="viewExpense-sub-container">
         <Select value={selectedOption} onChange={handleSelectChange} placeholder="All" width="250px">
           <option value="thisWeek">This Week</option>
           <option value="thisMonth">This Month</option>
@@ -90,33 +112,57 @@ export const ViewExpense = () => {
           </Stack>
         </RadioGroup>
       </div>
-      <div style={{ width: "100%", padding: 15 }}>
+      <div className="viewExpense-table-container">
         <table className="expense-table">
           <thead>
             <tr>
               <th>Transaction Date</th>
               <th>Description</th>
-              <th>Debit</th>
-              <th>Credit</th>
+              {selectedTransactionType !== false && <th>Debit</th>}
+              {selectedTransactionType !== true && <th>Credit</th>}
               <th>Balance</th>
               <th>Category</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {data &&
-              data.map((transaction: Transaction) => (
+            {transactions &&
+              transactions.map((transaction: Transaction) => (
                 <tr>
                   <td>{transaction.transactions.transactionDate}</td>
                   <td>{transaction.transactions.description}</td>
-                  <td>{transaction.transactions.debit}</td>
-                  <td>{transaction.transactions.credit}</td>
+                  {selectedTransactionType !== false && <td>{transaction.transactions.debit}</td>}
+                  {selectedTransactionType !== true && <td>{transaction.transactions.credit}</td>}
                   <td>{transaction.transactions.balance}</td>
                   <td>{transaction.transactions.category}</td>
+                  <td>
+                    <EditIcon />{" "}
+                    <button onClick={() => console.log("riitka")}>
+                      <DeleteIcon />
+                    </button>
+                  </td>
                 </tr>
               ))}
           </tbody>
         </table>
-        <nav></nav>
+        <div className="pagination-controls">
+          <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+            {"<"}
+          </Button>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <Button
+              key={index}
+              onClick={() => handlePageChange(index + 1)}
+              disabled={currentPage === index + 1}
+              className={currentPage === index + 1 ? "currentPage" : "otherPage"}
+            >
+              {index + 1}
+            </Button>
+          ))}
+          <Button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+            {">"}
+          </Button>
+        </div>
       </div>
     </div>
   );

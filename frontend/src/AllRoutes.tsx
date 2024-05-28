@@ -13,7 +13,6 @@ const AllRoutes = () => {
         <Route path="/upload" element={<UploadExcel />} />
         <Route path="/view" element={<ViewExpense />} />
         <Route path="/analyse" element={<AnalyseExpense />} />
-        {/* <Route path="/settings" element={<Settings />} /> */}
       </Routes>
     </div>
   );

@@ -15,3 +15,17 @@
   width: 20px;
   border-bottom: 0.5px solid rgb(203, 203, 203);
 }
+.viewExpense-main-container{
+  width: 100%;
+   border-radius: 10;
+    padding: 10 ;
+}
+.viewExpense-sub-container{
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.viewExpense-table-container{
+  width: 100%;
+  padding: 15;
+}
