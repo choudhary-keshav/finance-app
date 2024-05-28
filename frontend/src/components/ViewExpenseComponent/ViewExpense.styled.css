@@ -3,29 +3,54 @@
 }
 
 .expense-table th {
-  padding: 12px;
+  font-weight: 400;
+  background-color: #39532f;
+  height: 60px;
+  font-size: 0.9vw;
+  color: white;
+  padding: 1rem;
   text-align: center;
-  width: 20px;
-  border-bottom: 0.5px solid rgb(94, 94, 94);
+  text-transform: capitalize;
 }
 
 .expense-table td {
-  padding: 12px;
+  padding: 15px;
   text-align: center;
   width: 20px;
   border-bottom: 0.5px solid rgb(203, 203, 203);
 }
-.viewExpense-main-container{
-  width: 100%;
-   border-radius: 10;
-    padding: 10 ;
+
+.expense-table .credit {
+  /* background-color: #e9fce2; */
+  background-color: #e3ebedb0;
+  /* background-color: #e9e7e7b0; */
+  /* color: #316d1c; */
+  color: black;
+  font-weight: 500;
 }
-.viewExpense-sub-container{
+
+.expense-table .debit {
+  /* background-color: #ffe4e4; */
+  /* background-color: #eeeeeeb0; */
+  /* color: #651919; */
+  font-weight: 500;
+  color: black;
+}
+
+.viewExpense-main-container {
+  width: 100%;
+  border-radius: 10;
+  padding: 10;
+}
+.viewExpense-sub-container {
   display: flex;
   gap: 20px;
   align-items: center;
+  margin: 18px;
+  margin-left: auto;
 }
-.viewExpense-table-container{
+
+.viewExpense-table-container {
   width: 100%;
   padding: 15;
 }

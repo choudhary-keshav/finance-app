@@ -84,6 +84,7 @@ export const ViewExpense = () => {
     console.log("pages", currentPage, totalPages);
   };
 
+
   return (
     <div className="viewExpense-main-container">
       <div className="viewExpense-sub-container">
@@ -116,26 +117,42 @@ export const ViewExpense = () => {
         <table className="expense-table">
           <thead>
             <tr>
-              <th>Transaction Date</th>
+              <th style={{ borderTopLeftRadius: 10 }}>Transaction Date</th>
               <th>Description</th>
               {selectedTransactionType !== false && <th>Debit</th>}
               {selectedTransactionType !== true && <th>Credit</th>}
               <th>Balance</th>
               <th>Category</th>
-              <th>Action</th>
+              <th style={{ borderTopRightRadius: 10 }}>Action</th>
             </tr>
           </thead>
           <tbody>
             {transactions &&
-              transactions.map((transaction: Transaction) => (
+              transactions.map((transaction: Transaction, i: any) => (
                 <tr>
-                  <td>{transaction.transactions.transactionDate}</td>
-                  <td>{transaction.transactions.description}</td>
-                  {selectedTransactionType !== false && <td>{transaction.transactions.debit}</td>}
-                  {selectedTransactionType !== true && <td>{transaction.transactions.credit}</td>}
-                  <td>{transaction.transactions.balance}</td>
-                  <td>{transaction.transactions.category}</td>
-                  <td>
+                  <td className={i%2===0 ? "debit" : "credit"}>
+                    {transaction.transactions.transactionDate}
+                  </td>
+                  <td className={i%2===0 ? "debit" : "credit"}>
+                    {transaction.transactions.description}
+                  </td>
+                  {selectedTransactionType !== false && (
+                    <td className={i%2===0 ? "debit" : "credit"}>
+                      {transaction.transactions.debit}
+                    </td>
+                  )}
+                  {selectedTransactionType !== true && (
+                    <td className={i%2===0 ? "debit" : "credit"}>
+                      {transaction.transactions.credit}
+                    </td>
+                  )}
+                  <td className={i%2===0 ? "debit" : "credit"}>
+                    {transaction.transactions.balance}
+                  </td>
+                  <td className={i%2===0 ? "debit" : "credit"}>
+                    {transaction.transactions.category}
+                  </td>
+                  <td className={i%2===0 ? "debit" : "credit"}>
                     <EditIcon />{" "}
                     <button onClick={() => console.log("riitka")}>
                       <DeleteIcon />
@@ -145,6 +162,8 @@ export const ViewExpense = () => {
               ))}
           </tbody>
         </table>
+
+
         <div className="pagination-controls">
           <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
             {"<"}

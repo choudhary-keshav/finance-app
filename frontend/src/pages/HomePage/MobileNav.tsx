@@ -33,6 +33,7 @@ const MobileNav: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
   return (
     <>
       <Flex
+        backgroundColor='#e2e2e2b0'
         ml={{ base: 0, md: 60 }}
         px={{ base: 4, md: 4 }}
         height="20"
@@ -52,8 +53,8 @@ const MobileNav: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
 
         <Text display={{ base: "flex", md: "none" }} fontSize="2xl" fontFamily="monospace" fontWeight="bold"></Text>
 
-        <HStack spacing={{ base: "0", md: "6" }}>
-          <Flex alignItems={"center"}>
+        <HStack spacing={{ base: "0", md: "6" }} >
+          <Flex alignItems={"center"} >
             <Menu>
               <MenuButton py={2} transition="all 0.3s" _focus={{ boxShadow: "none" }}>
                 <HStack>

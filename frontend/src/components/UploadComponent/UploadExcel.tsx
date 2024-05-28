@@ -7,7 +7,7 @@ import { DateTime } from "luxon";
 import { Select, Button, Input, FormControl, FormLabel, useDisclosure } from "@chakra-ui/react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import TransactionModal from "../SingleTransactionComponent/TransactionModal";
+import TransactionModal from "../../pages/modals/TransactionModal";
 
 interface TransactionFormData {
   transactionDate: string;

@@ -22,10 +22,12 @@ const SidebarContent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       w={{ base: "full", md: 60 }}
       pos="fixed"
       h="full"
+      // marginTop={5}
+      backgroundColor='#e2e2e2b0'
     >
-      <Flex h="20" alignItems="center"  justifyContent="space-between">
+      <Flex marginTop={5} marginBottom={12} h="20" alignItems="center"  justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" margin="auto">
-          <Image borderRadius="cover" boxSize="70px" src={logoImg} alt="logo" align="center" />
+          <Image borderRadius="cover" boxSize="90px" src={logoImg} alt="logo" align="center" />
         </Text>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
