@@ -1,32 +1,32 @@
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Table, Thead, Tbody, Tr, Th, Td, Box } from "@chakra-ui/react";
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { DateTime } from "luxon";
-import {
-  Select,
-  Button,
-  Input,
-  FormControl,
-  FormLabel,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Select, Button, Input, FormControl, FormLabel, useDisclosure } from "@chakra-ui/react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import TransactionModal from "../../pages/modals/TransactionModal";
+import { isEditable } from "@testing-library/user-event/dist/utils";
+
+interface TransactionFormData {
+  transactionDate: string;
+  description: string;
+  amount: string;
+  type: string;
+  balance: string;
+  category: string;
+}
 
 const UploadExcel: React.FC = () => {
   const [excelData, setExcelData] = useState<(string | null | undefined)[][]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [transactionFormData, setTransactionFormData] = useState({
+  const [transactionFormData, setTransactionFormData] = useState<TransactionFormData>({
     transactionDate: "",
     description: "",
-    debit: "",
-    credit: "",
+    amount: "",
+    type: "",
     balance: "",
     category: "",
   });
@@ -36,13 +36,26 @@ const UploadExcel: React.FC = () => {
   const serialNumberToDate = (serialNumber: number): string => {
     const millisecondsSinceUnixEpoch = (serialNumber - 25569) * 86400 * 1000;
     const luxonDateTime = DateTime.fromMillis(millisecondsSinceUnixEpoch);
-    const formattedDate = luxonDateTime.toFormat("dd-MM-yyyy");
-    return formattedDate;
+    return luxonDateTime.toFormat("dd-MM-yyyy");
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    const validMimeTypes = [
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ];
+    const validExtensions = [".xls", ".xlsx"];
+
+    const fileExtension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+    const isValidFile = validMimeTypes.includes(file.type) && validExtensions.includes(fileExtension);
+
+    if (!isValidFile) {
+      toast.error("Please upload a valid Excel file ('.xls' or '.xlsx').");
+      return;
+    }
 
     const reader = new FileReader();
 
@@ -59,9 +72,7 @@ const UploadExcel: React.FC = () => {
       const filteredData = jsonData
         .filter((row: (string | null | undefined)[]) => row.some((cell) => cell !== null && cell !== undefined))
         .map((row: (string | null | undefined)[]) =>
-          row.map((cell, index) =>
-            index === 0 ? serialNumberToDate(Number(cell || 0)) : cell === null || cell === undefined ? "" : cell
-          )
+          row.map((cell, index) => (index === 0 ? serialNumberToDate(Number(cell || 0)) : cell || ""))
         );
 
       setExcelData(filteredData.slice(1));
@@ -85,18 +96,21 @@ const UploadExcel: React.FC = () => {
     }));
   };
 
-  const handleTransactionFormSubmit = () => {
+  const handleTransactionFormSubmit = async () => {
     if (!transactionFormData.transactionDate || !transactionFormData.description) {
       console.log("Enter transaction date and description");
       return;
     }
+
+    const formattedDate = DateTime.fromISO(transactionFormData.transactionDate).toFormat("dd-MM-yyyy");
+
     const updatedExcelData = [
       ...excelData,
       [
-        transactionFormData.transactionDate,
+        formattedDate,
         transactionFormData.description,
-        transactionFormData.debit,
-        transactionFormData.credit,
+        transactionFormData.type === "debit" ? transactionFormData.amount : "",
+        transactionFormData.type === "credit" ? transactionFormData.amount : "",
         transactionFormData.balance,
       ],
     ];
@@ -105,12 +119,48 @@ const UploadExcel: React.FC = () => {
     setTransactionFormData({
       transactionDate: "",
       description: "",
-      debit: "",
-      credit: "",
+      amount: "",
+      type: "",
       balance: "",
       category: "",
     });
 
+    try {
+      const userInfoString = localStorage.getItem("token");
+      const decodedToken: {
+        payload: {
+          _id: string;
+          name: string;
+          email: string;
+          pic: string;
+        };
+      } = jwtDecode(userInfoString || "");
+
+      if (!userInfoString) {
+        console.error("User information not found in local storage");
+        return;
+      }
+
+      if (!decodedToken.payload._id) {
+        console.error("User information invalid or missing _id");
+        return;
+      }
+
+      const userId = decodedToken.payload._id;
+
+      const response = await axios.post("http://localhost:5000/api/saveExcelData", {
+        excelData: updatedExcelData,
+        selectedCategories,
+        userId,
+      });
+
+      toast.success("Transaction added successfully");
+      console.log("Data saved:", response.data);
+    } catch (error) {
+      toast.error("Error saving data");
+      console.error("Error saving data:", error);
+    }
+    setExcelData([]);
     onClose();
   };
 
@@ -144,8 +194,11 @@ const UploadExcel: React.FC = () => {
         userId,
       });
 
+      toast.success("Data saved successfully");
       console.log("Data saved:", response.data);
+      setExcelData([]);
     } catch (error) {
+      toast.error("Error saving data");
       console.error("Error saving data:", error);
     }
   };
@@ -158,127 +211,67 @@ const UploadExcel: React.FC = () => {
 
   return (
     <div className="excel-table-container">
-      <input type="file" onChange={handleFileUpload} />
-      {excelData.length > 0 && (
-        <div>
-          <table className="excel-table">
-            <thead>
-              <tr>
-                <th>Transaction Date</th>
-                <th>Description</th>
-                <th>Debit</th>
-                <th>Credit</th>
-                <th>Balance</th>
-                <th>Category</th>
-              </tr>
-            </thead>
-            <tbody>
-              {excelData.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {row.map((cell, cellIndex) => (
-                    <td key={cellIndex}>{cell}</td>
-                  ))}
-                  <td>
-                    <Select
-                      value={selectedCategories[rowIndex] || ""}
-                      onChange={(e) => handleCategoryChange(rowIndex, e.target.value)}
-                      placeholder="Select category"
-                    >
-                      <option value="food">Food</option>
-                      <option value="travel">Travel</option>
-                      <option value="other">Other</option>
-                    </Select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <Button onClick={handleSaveData} colorScheme="blue" mt="4">
-            Save Data
-          </Button>
-        </div>
-      )}
-      <Button onClick={onOpen} colorScheme="blue" mt="4">
+      <ToastContainer />
+      <FormControl>
+        <FormLabel>Select Excel File:</FormLabel>
+        <Input type="file" onChange={handleFileUpload} w="300px" />
+      </FormControl>
+
+      <Button onClick={handleSaveData} colorScheme="blue" margin="4">
+        Save Data
+      </Button>
+
+      <Button onClick={onOpen} colorScheme="blue" margin="4">
         Add a single transaction
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add a single transaction</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Transaction Date</FormLabel>
-              <Input
-                type="date"
-                name="transactionDate"
-                value={transactionFormData.transactionDate}
-                onChange={handleTransactionFormChange}
-                placeholder="Transaction Date"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Description</FormLabel>
-              <Input
-                type="text"
-                name="description"
-                value={transactionFormData.description}
-                onChange={handleTransactionFormChange}
-                placeholder="Description"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Debit</FormLabel>
-              <Input
-                type="text"
-                name="debit"
-                value={transactionFormData.debit}
-                onChange={handleTransactionFormChange}
-                placeholder="Debit"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Credit</FormLabel>
-              <Input
-                type="text"
-                name="credit"
-                value={transactionFormData.credit}
-                onChange={handleTransactionFormChange}
-                placeholder="Credit"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Balance</FormLabel>
-              <Input
-                type="text"
-                name="balance"
-                value={transactionFormData.balance}
-                onChange={handleTransactionFormChange}
-                placeholder="Balance"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Category</FormLabel>
-              <Select
-                name="category"
-                value={transactionFormData.category}
-                onChange={handleCategoryNewTransaction}
-                placeholder="Select category"
-              >
-                <option value="food">Food</option>
-                <option value="travel">Travel</option>
-                <option value="other">Other</option>
-              </Select>
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleTransactionFormSubmit} colorScheme="blue" mr={3}>
-              Add Transaction
-            </Button>
-            <Button onClick={onClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+
+      {excelData.length > 0 && (
+        <div>
+          <Box margin="4">
+            <Table variant="striped" colorScheme="gray">
+              <Thead>
+                <Tr>
+                  <Th>Transaction Date</Th>
+                  <Th>Description</Th>
+                  <Th>Debit</Th>
+                  <Th>Credit</Th>
+                  <Th>Balance</Th>
+                  <Th>Category</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {excelData.map((row, rowIndex) => (
+                  <Tr key={rowIndex}>
+                    {row.map((cell, cellIndex) => (
+                      <Td key={cellIndex}>{cell}</Td>
+                    ))}
+                    <Td>
+                      <Select
+                        value={selectedCategories[rowIndex] || ""}
+                        onChange={(e) => handleCategoryChange(rowIndex, e.target.value)}
+                        placeholder="Select category"
+                      >
+                        <option value="food">Food</option>
+                        <option value="travel">Travel</option>
+                        <option value="other">Other</option>
+                      </Select>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
+        </div>
+      )}
+      <TransactionModal
+        isOpen={isOpen}
+        onClose={onClose}
+        transactionFormData={transactionFormData}
+        handleTransactionFormChange={handleTransactionFormChange}
+        handleTransactionFormSubmit={handleTransactionFormSubmit}
+        handleCategoryNewTransaction={handleCategoryNewTransaction}
+        isEditing={false}
+      />
     </div>
   );
 };

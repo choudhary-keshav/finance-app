@@ -1,8 +1,13 @@
 {
   "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/material": "^5.15.18",
     "@reduxjs/toolkit": "^2.2.4",
     "luxon": "^3.4.4",
-    "react-redux": "^9.1.2"
+    "react-redux": "^9.1.2",
+    "react-toastify": "^10.0.5"
   },
   "devDependencies": {
     "@types/redux-persist": "^4.3.1"

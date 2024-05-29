@@ -7,10 +7,10 @@ import logoImg from "../../assets/images/download-removebg-preview.png"
 
 const LinkItems: Array<LinkItemProps> = [
   // { name: "Home", icon: FiHome, to: "/home" },
+  { name: "Dashboard", icon: FiSettings, to: "/dashboard" },
   { name: "Upload Excel Sheet", icon: FiTrendingUp, to: "/upload" },
   { name: "View Expense", icon: FiCompass, to: "/view" },
   { name: "Analyse Expense", icon: FiStar, to: "/analyse" },
-  { name: "Settings", icon: FiSettings, to: "/settings" },
 ];
 const SidebarContent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   return (
@@ -22,10 +22,12 @@ const SidebarContent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       w={{ base: "full", md: 60 }}
       pos="fixed"
       h="full"
+      // marginTop={5}
+      backgroundColor='#e2e2e2b0'
     >
-      <Flex h="20" alignItems="center"  justifyContent="space-between">
+      <Flex marginTop={5} marginBottom={12} h="20" alignItems="center"  justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" margin="auto">
-          <Image borderRadius="cover" boxSize="70px" src={logoImg} alt="logo" align="center" />
+          <Image borderRadius="cover" boxSize="90px" src={logoImg} alt="logo" align="center" />
         </Text>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>

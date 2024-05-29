@@ -1,16 +1,32 @@
-import React, { useState } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, TableCaption, TableContainer, Stack } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { Stack } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
-import { useViewTransactionQuery } from "../../redux/services/viewTransactionApi";
-import { Transaction, TransactionDetails } from "../../interfaces/interface";
-import { Radio, RadioGroup } from "@chakra-ui/react";
+import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
+import { Transaction } from "../../interfaces/interface";
+import { Radio, RadioGroup, Button } from "@chakra-ui/react";
+import "./ViewExpense.styled.css";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import TransactionModal from "../../pages/modals/TransactionModal";
 
 export const ViewExpense = () => {
-  const [selectedOption, setSelectedOption] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedOption, setSelectedOption] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedTransactionType, setSelectedTransactionType] = useState<boolean | undefined>(undefined);
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [transactionFormData, setTransactionFormData] = useState({
+    transactionDate: "",
+    description: "",
+    amount: "",
+    type: "",
+    balance: "",
+    category: "",
+  });
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -19,31 +35,49 @@ export const ViewExpense = () => {
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
-  console.log("ritika", selectedOption);
+
+  const [trigger] = useLazyViewTransactionQuery();
   const queryParams = {
     period: selectedOption,
     category: selectedCategory,
     isDebit: selectedTransactionType,
     customPeriodStart: selectedOption === "custom" ? formatDate(fromDate) : undefined,
     customPeriodEnd: selectedOption === "custom" ? formatDate(toDate) : undefined,
+    page: currentPage,
+    limit: 10,
   };
 
-  const { data: transactions, isLoading } = useViewTransactionQuery(queryParams);
-  console.log(transactions);
-  const handleSelectChange = (event: any) => {
+  useEffect(() => {
+    trigger(queryParams).then((response: any) => {
+      if (response.data) {
+        setTotalPages(response.data.totalPages);
+        setTransactions(response.data.transactions);
+      }
+    });
+  }, [selectedOption, selectedCategory, selectedTransactionType, fromDate, toDate, currentPage]);
+
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
+    setFromDate("");
+    setToDate("");
+    setCurrentPage(1);
   };
 
-  const handleFromDateChange = (event: any) => {
+  const handleFromDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFromDate(event.target.value);
+    setCurrentPage(1);
   };
 
-  const handleToDateChange = (event: any) => {
+  const handleToDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setToDate(event.target.value);
+    setCurrentPage(1);
   };
-  const handleCategoryChange = (event: any) => {
+
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(event.target.value);
+    setCurrentPage(1);
   };
+
   const handleTransactionTypeChange = (value: string) => {
     if (value === "debit") {
       setSelectedTransactionType(true);
@@ -52,13 +86,48 @@ export const ViewExpense = () => {
     } else {
       setSelectedTransactionType(undefined);
     }
+    setCurrentPage(1);
   };
 
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+  const handleEditClick = (transaction: Transaction) => {
+    setTransactionFormData({
+      transactionDate: transaction.transactions.transactionDate,
+      description: transaction.transactions.description,
+      amount: transaction.transactions.debit || transaction.transactions.credit,
+      type: transaction.transactions.debit ? "debit" : "credit",
+      balance: transaction.transactions.balance,
+      category: transaction.transactions.category,
+    });
+    setIsModalOpen(true);
+    setIsEditing(true);
+  };
+
+  const handleTransactionFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setTransactionFormData({
+      ...transactionFormData,
+      [e.target.name]: e.target.value,
+    });
+    console.log(transactionFormData);
+  };
+
+  const handleTransactionFormSubmit = () => {
+    console.log("data edited", transactionFormData);
+    setIsModalOpen(false);
+  };
+
+  const handleCategoryNewTransaction = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setTransactionFormData({
+      ...transactionFormData,
+      category: e.target.value,
+    });
+  };
   return (
-    <>
-      <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
-        <Select value={selectedOption} onChange={handleSelectChange} placeholder="Select option" width="250px">
-          <option value="">All</option>
+    <div className="viewExpense-main-container">
+      <div className="viewExpense-sub-container">
+        <Select value={selectedOption} onChange={handleSelectChange} placeholder="All" width="250px">
           <option value="thisWeek">This Week</option>
           <option value="thisMonth">This Month</option>
           <option value="thisYear">This Year</option>
@@ -70,13 +139,11 @@ export const ViewExpense = () => {
             <input type="date" placeholder="to" value={toDate} onChange={handleToDateChange} />
           </>
         )}
-        <Select value={selectedCategory} onChange={handleCategoryChange} placeholder="Select categpry" width="250px">
-          <option value="">All</option>
-          <option value="food">food</option>
-          <option value="travel">travel</option>
-          <option value="other">other</option>
+        <Select value={selectedCategory} onChange={handleCategoryChange} placeholder="All" width="250px">
+          <option value="food">Food</option>
+          <option value="travel">Travel</option>
+          <option value="other">Other</option>
         </Select>
-
         <RadioGroup onChange={handleTransactionTypeChange}>
           <Stack direction="row">
             <Radio value="debit">Debit</Radio>
@@ -85,35 +152,74 @@ export const ViewExpense = () => {
           </Stack>
         </RadioGroup>
       </div>
-
-      <TableContainer>
-        <Table variant="simple">
-          <TableCaption>Transaction made with this user account</TableCaption>
-          <Thead>
-            <Tr>
-              <Th>Transaction Date</Th>
-              <Th>Description</Th>
-              <Th>Debit</Th>
-              <Th>Credit</Th>
-              <Th>Balance</Th>
-              <Th>Category</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
+      <div className="viewExpense-table-container">
+        <table className="expense-table">
+          <thead>
+            <tr>
+              <th style={{ borderTopLeftRadius: 10 }}>Transaction Date</th>
+              <th>Description</th>
+              {selectedTransactionType !== false && <th>Debit</th>}
+              {selectedTransactionType !== true && <th>Credit</th>}
+              <th>Balance</th>
+              <th>Category</th>
+              <th style={{ borderTopRightRadius: 10 }}>Action</th>
+            </tr>
+          </thead>
+          <tbody>
             {transactions &&
-              transactions.map((transaction: Transaction) => (
-                <Tr>
-                  <Td>{transaction.transactions.transactionDate}</Td>
-                  <Td>{transaction.transactions.description}</Td>
-                  <Td>{transaction.transactions.debit}</Td>
-                  <Td>{transaction.transactions.credit}</Td>
-                  <Td>{transaction.transactions.balance}</Td>
-                  <Td>{transaction.transactions.category}</Td>
-                </Tr>
+              transactions.map((transaction: Transaction, i: any) => (
+                <tr>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.transactionDate}</td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.description}</td>
+                  {selectedTransactionType !== false && (
+                    <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.debit}</td>
+                  )}
+                  {selectedTransactionType !== true && (
+                    <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.credit}</td>
+                  )}
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.balance}</td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.category}</td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    <Button onClick={() => handleEditClick(transaction)}>
+                      <EditIcon />
+                    </Button>
+                    <Button>
+                      <DeleteIcon />
+                    </Button>
+                  </td>
+                </tr>
               ))}
-          </Tbody>
-        </Table>
-      </TableContainer>
-    </>
+          </tbody>
+        </table>
+
+        <div className="pagination-controls">
+          <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+            {"<"}
+          </Button>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <Button
+              key={index}
+              onClick={() => handlePageChange(index + 1)}
+              disabled={currentPage === index + 1}
+              className={currentPage === index + 1 ? "currentPage" : "otherPage"}
+            >
+              {index + 1}
+            </Button>
+          ))}
+          <Button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+            {">"}
+          </Button>
+        </div>
+      </div>
+      <TransactionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        transactionFormData={transactionFormData}
+        handleTransactionFormChange={handleTransactionFormChange}
+        handleTransactionFormSubmit={handleTransactionFormSubmit}
+        handleCategoryNewTransaction={handleCategoryNewTransaction}
+        isEditing={isEditing}
+      />
+    </div>
   );
 };

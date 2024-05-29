@@ -8,14 +8,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
+    <Box minH="100vh" minW="100%" >
       <SidebarWithHeader onClose={onClose} isOpen={isOpen} onOpen={onOpen} />
-      <Box ml={{ base: 0, md: 60 }} p="4">
+      <Box ml={{ base: 0, md: 20 }} p="1">
         {children}
+        <div style={{ height: '100%',minHeight:'500px', width: '85%', backgroundColor: "white", marginLeft: 200 }}>
+          <AllRoutes />
+        </div>
       </Box>
-      <div style={{ height: 700, width: 1500, backgroundColor: "white", marginLeft: 250 }}>
-       <AllRoutes />
-      </div>
     </Box>
   );
 };

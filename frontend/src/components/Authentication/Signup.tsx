@@ -73,7 +73,6 @@ const Signup = () => {
     
     try {
       const data = await createNewUser({ name, email, password });
-      console.log(data);
       if (data.error) {
         showNotification(
           isFetchBaseQueryError(data.error) && data.error.data && hasMessage(data.error.data)
