@@ -18,13 +18,14 @@ export const ViewExpense = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [transactionFormData, setTransactionFormData] = useState({
     transactionDate: "",
     description: "",
     amount: "",
     type: "",
     balance: "",
+
     category: "",
   });
 
@@ -102,7 +103,7 @@ export const ViewExpense = () => {
       category: transaction.transactions.category,
     });
     setIsModalOpen(true);
-     setIsEditing(true);
+    setIsEditing(true);
   };
 
   const handleTransactionFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -114,7 +115,7 @@ export const ViewExpense = () => {
   };
 
   const handleTransactionFormSubmit = () => {
-    console.log("data edited",transactionFormData)
+    console.log("data edited", transactionFormData);
     setIsModalOpen(false);
   };
 
@@ -167,10 +168,13 @@ export const ViewExpense = () => {
           </thead>
           <tbody>
             {transactions &&
-              transactions.map((transaction: Transaction, i: any) => (
+              transactions.map((transaction: Transaction, i: number) => (
                 <tr>
                   <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.transactionDate}</td>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.description}</td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    {transaction.transactions.description.charAt(0).toUpperCase() +
+                      transaction.transactions.description.slice(1)}
+                  </td>
                   {selectedTransactionType !== false && (
                     <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.debit}</td>
                   )}
@@ -193,7 +197,7 @@ export const ViewExpense = () => {
         </table>
 
         <div className="pagination-controls">
-          <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+          <Button onClick={() => handlePageChange(currentPage - 1)} isDisabled={currentPage === 1}>
             {"<"}
           </Button>
           {Array.from({ length: totalPages }, (_, index) => (
@@ -206,7 +210,7 @@ export const ViewExpense = () => {
               {index + 1}
             </Button>
           ))}
-          <Button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+          <Button onClick={() => handlePageChange(currentPage + 1)} isDisabled={currentPage === totalPages}>
             {">"}
           </Button>
         </div>

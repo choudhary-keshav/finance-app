@@ -8,7 +8,8 @@ import { Select, Button, Input, FormControl, FormLabel, useDisclosure } from "@c
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import TransactionModal from "../../pages/modals/TransactionModal";
-import { isEditable } from "@testing-library/user-event/dist/utils";
+import { isDisabled, isEditable } from "@testing-library/user-event/dist/utils";
+import "./UploadExcel.styled.css";
 
 interface TransactionFormData {
   transactionDate: string;
@@ -22,6 +23,7 @@ interface TransactionFormData {
 const UploadExcel: React.FC = () => {
   const [excelData, setExcelData] = useState<(string | null | undefined)[][]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [isFileUploaded, setIsFileUploaded] = useState<boolean>(false);
   const [transactionFormData, setTransactionFormData] = useState<TransactionFormData>({
     transactionDate: "",
     description: "",
@@ -41,7 +43,10 @@ const UploadExcel: React.FC = () => {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log("khli h");
+      return;
+    }
 
     const validMimeTypes = [
       "application/vnd.ms-excel",
@@ -74,11 +79,17 @@ const UploadExcel: React.FC = () => {
         .map((row: (string | null | undefined)[]) =>
           row.map((cell, index) => (index === 0 ? serialNumberToDate(Number(cell || 0)) : cell || ""))
         );
-
+      if (filteredData.length <= 1) {
+        toast.error("The uploaded file is empty or contains no valid data.");
+        setIsFileUploaded(false);
+        return;
+      }
       setExcelData(filteredData.slice(1));
-      setSelectedCategories(new Array(filteredData.length - 1).fill(""));
+      setSelectedCategories(
+        filteredData.slice(1).map((row) => (row[5] ? (row[5] as string) : "")) // Assuming category is in the 6th column
+      );
     };
-
+    setIsFileUploaded(true);
     reader.readAsArrayBuffer(file);
   };
 
@@ -211,19 +222,27 @@ const UploadExcel: React.FC = () => {
 
   return (
     <div className="excel-table-container">
-      <ToastContainer />
-      <FormControl>
-        <FormLabel>Select Excel File:</FormLabel>
-        <Input type="file" onChange={handleFileUpload} w="300px" />
-      </FormControl>
-
-      <Button onClick={handleSaveData} colorScheme="blue" margin="4">
-        Save Data
-      </Button>
-
-      <Button onClick={onOpen} colorScheme="blue" margin="4">
-        Add a single transaction
-      </Button>
+      <div className="upload-excel-form-container">
+        <ToastContainer />
+        <FormControl>
+          <FormLabel>Select Excel File:</FormLabel>
+          <Input type="file" onChange={handleFileUpload} w="300px" />
+        </FormControl>
+        <Button
+          size="lg"
+          colorScheme="teal"
+          onClick={handleSaveData}
+          margin="7"
+          padding="20px"
+          isDisabled={!isFileUploaded}
+          width="30%"
+        >
+          Save Data
+        </Button>
+        <Button size="lg" colorScheme="teal" onClick={onOpen} margin="7" padding="22px" width="35%">
+          Add a single transaction
+        </Button>
+      </div>
 
       {excelData.length > 0 && (
         <div>
@@ -242,19 +261,23 @@ const UploadExcel: React.FC = () => {
               <Tbody>
                 {excelData.map((row, rowIndex) => (
                   <Tr key={rowIndex}>
-                    {row.map((cell, cellIndex) => (
+                    {row.slice(0, 5).map((cell, cellIndex) => (
                       <Td key={cellIndex}>{cell}</Td>
                     ))}
                     <Td>
-                      <Select
-                        value={selectedCategories[rowIndex] || ""}
-                        onChange={(e) => handleCategoryChange(rowIndex, e.target.value)}
-                        placeholder="Select category"
-                      >
-                        <option value="food">Food</option>
-                        <option value="travel">Travel</option>
-                        <option value="other">Other</option>
-                      </Select>
+                      {selectedCategories[rowIndex] ? (
+                        <span>{selectedCategories[rowIndex]}</span>
+                      ) : (
+                        <Select
+                          value={selectedCategories[rowIndex] || ""}
+                          onChange={(e) => handleCategoryChange(rowIndex, e.target.value)}
+                          placeholder="Select category"
+                        >
+                          <option value="food">Food</option>
+                          <option value="travel">Travel</option>
+                          <option value="other">Other</option>
+                        </Select>
+                      )}
                     </Td>
                   </Tr>
                 ))}

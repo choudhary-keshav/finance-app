@@ -6,7 +6,7 @@ import NavItem from "./NavItem";
 import logoImg from "../../assets/images/download-removebg-preview.png"
 
 const LinkItems: Array<LinkItemProps> = [
-  // { name: "Home", icon: FiHome, to: "/home" },
+  
   { name: "Dashboard", icon: FiSettings, to: "/dashboard" },
   { name: "Upload Excel Sheet", icon: FiTrendingUp, to: "/upload" },
   { name: "View Expense", icon: FiCompass, to: "/view" },
