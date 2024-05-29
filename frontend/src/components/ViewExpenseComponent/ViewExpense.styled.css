@@ -21,18 +21,12 @@
 }
 
 .expense-table .credit {
-  /* background-color: #e9fce2; */
   background-color: #e3ebedb0;
-  /* background-color: #e9e7e7b0; */
-  /* color: #316d1c; */
   color: black;
   font-weight: 500;
 }
 
 .expense-table .debit {
-  /* background-color: #ffe4e4; */
-  /* background-color: #eeeeeeb0; */
-  /* color: #651919; */
   font-weight: 500;
   color: black;
 }
@@ -53,4 +47,11 @@
 .viewExpense-table-container {
   width: 100%;
   padding: 15;
+}
+.pagination-controls{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
 }

@@ -117,7 +117,6 @@ export const getTransactions = async (req: Request, res: Response) => {
     },
   });
  
-console.log(pipeline)
   try {
     const result = await Transaction.aggregate(pipeline);
     const transactions = result[0].totalData;

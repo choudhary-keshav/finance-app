@@ -6,6 +6,7 @@ import { Transaction } from "../../interfaces/interface";
 import { Radio, RadioGroup, Button } from "@chakra-ui/react";
 import "./ViewExpense.styled.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import TransactionModal from "../../pages/modals/TransactionModal";
 
 export const ViewExpense = () => {
   const [selectedOption, setSelectedOption] = useState<string>("");
@@ -16,6 +17,16 @@ export const ViewExpense = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [transactionFormData, setTransactionFormData] = useState({
+    transactionDate: "",
+    description: "",
+    amount: "",
+    type: "",
+    balance: "",
+    category: "",
+  });
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -39,7 +50,6 @@ export const ViewExpense = () => {
   useEffect(() => {
     trigger(queryParams).then((response: any) => {
       if (response.data) {
-        console.log(response.data);
         setTotalPages(response.data.totalPages);
         setTransactions(response.data.transactions);
       }
@@ -81,10 +91,39 @@ export const ViewExpense = () => {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
-    console.log("pages", currentPage, totalPages);
+  };
+  const handleEditClick = (transaction: Transaction) => {
+    setTransactionFormData({
+      transactionDate: transaction.transactions.transactionDate,
+      description: transaction.transactions.description,
+      amount: transaction.transactions.debit || transaction.transactions.credit,
+      type: transaction.transactions.debit ? "debit" : "credit",
+      balance: transaction.transactions.balance,
+      category: transaction.transactions.category,
+    });
+    setIsModalOpen(true);
+     setIsEditing(true);
   };
 
+  const handleTransactionFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setTransactionFormData({
+      ...transactionFormData,
+      [e.target.name]: e.target.value,
+    });
+    console.log(transactionFormData);
+  };
 
+  const handleTransactionFormSubmit = () => {
+    console.log("data edited",transactionFormData)
+    setIsModalOpen(false);
+  };
+
+  const handleCategoryNewTransaction = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setTransactionFormData({
+      ...transactionFormData,
+      category: e.target.value,
+    });
+  };
   return (
     <div className="viewExpense-main-container">
       <div className="viewExpense-sub-container">
@@ -130,39 +169,28 @@ export const ViewExpense = () => {
             {transactions &&
               transactions.map((transaction: Transaction, i: any) => (
                 <tr>
-                  <td className={i%2===0 ? "debit" : "credit"}>
-                    {transaction.transactions.transactionDate}
-                  </td>
-                  <td className={i%2===0 ? "debit" : "credit"}>
-                    {transaction.transactions.description}
-                  </td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.transactionDate}</td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.description}</td>
                   {selectedTransactionType !== false && (
-                    <td className={i%2===0 ? "debit" : "credit"}>
-                      {transaction.transactions.debit}
-                    </td>
+                    <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.debit}</td>
                   )}
                   {selectedTransactionType !== true && (
-                    <td className={i%2===0 ? "debit" : "credit"}>
-                      {transaction.transactions.credit}
-                    </td>
+                    <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.credit}</td>
                   )}
-                  <td className={i%2===0 ? "debit" : "credit"}>
-                    {transaction.transactions.balance}
-                  </td>
-                  <td className={i%2===0 ? "debit" : "credit"}>
-                    {transaction.transactions.category}
-                  </td>
-                  <td className={i%2===0 ? "debit" : "credit"}>
-                    <EditIcon />{" "}
-                    <button onClick={() => console.log("riitka")}>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.balance}</td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.category}</td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    <Button onClick={() => handleEditClick(transaction)}>
+                      <EditIcon />
+                    </Button>
+                    <Button>
                       <DeleteIcon />
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
           </tbody>
         </table>
-
 
         <div className="pagination-controls">
           <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
@@ -183,6 +211,15 @@ export const ViewExpense = () => {
           </Button>
         </div>
       </div>
+      <TransactionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        transactionFormData={transactionFormData}
+        handleTransactionFormChange={handleTransactionFormChange}
+        handleTransactionFormSubmit={handleTransactionFormSubmit}
+        handleCategoryNewTransaction={handleCategoryNewTransaction}
+        isEditing={isEditing}
+      />
     </div>
   );
 };

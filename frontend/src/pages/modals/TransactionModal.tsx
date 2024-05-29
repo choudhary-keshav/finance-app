@@ -25,13 +25,10 @@ interface TransactionModalProps {
     balance: string;
     category: string;
   };
-  handleTransactionFormChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => void;
+  handleTransactionFormChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleTransactionFormSubmit: () => void;
-  handleCategoryNewTransaction: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => void;
+  handleCategoryNewTransaction: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  isEditing: boolean;
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -41,12 +38,13 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   handleTransactionFormChange,
   handleTransactionFormSubmit,
   handleCategoryNewTransaction,
+  isEditing
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add a single transaction</ModalHeader>
+        <ModalHeader>{isEditing ? "Edit Transaction" : "Add Transaction"}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <FormControl>
@@ -116,12 +114,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Button
-            onClick={handleTransactionFormSubmit}
-            colorScheme="blue"
-            mr={3}
-          >
-            Add Transaction
+          <Button onClick={handleTransactionFormSubmit} colorScheme="blue" mr={3}>
+            {isEditing ? "Edit Transaction" : "Add Transaction"}
           </Button>
           <Button onClick={onClose}>Cancel</Button>
         </ModalFooter>
@@ -131,21 +125,3 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
 };
 
 export default TransactionModal;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

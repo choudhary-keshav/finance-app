@@ -8,6 +8,7 @@ import { Select, Button, Input, FormControl, FormLabel, useDisclosure } from "@c
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import TransactionModal from "../../pages/modals/TransactionModal";
+import { isEditable } from "@testing-library/user-event/dist/utils";
 
 interface TransactionFormData {
   transactionDate: string;
@@ -186,7 +187,6 @@ const UploadExcel: React.FC = () => {
       }
 
       const userId = decodedToken.payload._id;
-      console.log(userId);
 
       const response = await axios.post("http://localhost:5000/api/saveExcelData", {
         excelData,
@@ -270,6 +270,7 @@ const UploadExcel: React.FC = () => {
         handleTransactionFormChange={handleTransactionFormChange}
         handleTransactionFormSubmit={handleTransactionFormSubmit}
         handleCategoryNewTransaction={handleCategoryNewTransaction}
+        isEditing={false}
       />
     </div>
   );
