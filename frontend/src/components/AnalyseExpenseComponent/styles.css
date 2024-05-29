@@ -1,0 +1,22 @@
+.pie {
+  width: 400px;
+  height: 400px;
+}
+
+.flexDiv {
+  display: flex;
+}
+
+.bar {
+  height: 400px;
+  padding-left: 20px;
+}
+
+select {
+  border: 2px solid grey;
+  margin-right: 10px;
+}
+
+.barWrapper {
+  overflow-x: auto;
+}

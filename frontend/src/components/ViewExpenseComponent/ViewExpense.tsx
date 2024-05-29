@@ -19,7 +19,7 @@ export const ViewExpense = () => {
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
-console.log("ritika", selectedOption);
+  console.log("ritika", selectedOption);
   const queryParams = {
     period: selectedOption,
     category: selectedCategory,
@@ -29,7 +29,7 @@ console.log("ritika", selectedOption);
   };
 
   const { data: transactions, isLoading } = useViewTransactionQuery(queryParams);
-console.log(transactions)
+  console.log(transactions);
   const handleSelectChange = (event: any) => {
     setSelectedOption(event.target.value);
   };

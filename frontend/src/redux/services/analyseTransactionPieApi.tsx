@@ -19,7 +19,7 @@ export const transactionApi = createApi({
   }),
   endpoints: (builder) => ({
     viewTransaction: builder.query<
-      Transaction[],
+      PieData[],
       {
         category?: string;
         isDebit?: boolean;
