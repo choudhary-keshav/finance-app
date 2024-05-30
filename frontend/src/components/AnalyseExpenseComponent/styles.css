@@ -41,7 +41,7 @@ select {
 }
 
 .leftPie {
-  border-right: 1px dashed rgb(187, 187, 187);
+  border-right: 2px dashed rgb(187, 187, 187);
   padding-right: 30px;
   width: 510px;
   margin-left: 0px;

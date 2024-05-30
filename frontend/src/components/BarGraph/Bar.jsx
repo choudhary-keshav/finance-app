@@ -12,11 +12,14 @@ const BAR_VALUE_PADDING = 5;
 const BarLabels = ({ bars }) => {
   return (
     <g>
-      {bars.map(({ width, x, y, data: { formattedValue } }) => (
-        <text key={`${x}.${y}`} x={x + width / 2} y={y - BAR_VALUE_PADDING} textAnchor="middle">
-          {formattedValue}
-        </text>
-      ))}
+      {bars.map(
+        ({ width, height, x, y, data: { formattedValue } }) =>
+          height > 0 && (
+            <text key={`${x}.${y}`} x={x + width / 2} y={y - BAR_VALUE_PADDING} textAnchor="middle">
+              {formattedValue}
+            </text>
+          )
+      )}
     </g>
   );
 };

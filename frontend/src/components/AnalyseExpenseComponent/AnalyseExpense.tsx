@@ -187,8 +187,9 @@ export const AnalyseExpense = () => {
           </Select>
         </div>
       </div>
+      <br />
+      <h2>Bar Graph</h2>
       <div className="barWrapper">
-        <h2>Bar Graph</h2>
         <div className="bar" style={{ width: `${250 + barData.length * 70}px` }}>
           <Bar data={barData} indexBy="date" labelBottom="Date" labelLeft="Money (in ₹)" keys={["credit", "debit"]} />
         </div>
