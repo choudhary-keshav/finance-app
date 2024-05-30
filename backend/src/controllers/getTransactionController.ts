@@ -145,7 +145,7 @@ export const getTransactions = async (req: Request, res: Response) => {
     if (group === 'bar') {
       const groupStage: { _id: Object; credit: Object; debit: Object } = {
         _id: {
-          day: { $dayOfMonth: { $toDate: '$transactions.transactionDate' } },
+          day: { $dayOfMonth: { $toDate: '$transactions.datetime' } },
         },
         credit: {
           $sum: {
@@ -177,8 +177,8 @@ export const getTransactions = async (req: Request, res: Response) => {
         (endDate && startDate && calculateDaysBetween(startDate, endDate) > 30)
       ) {
         groupStage._id = {
-          month: { $month: '$transactions.transactionDate' },
-          year: { $year: '$transactions.transactionDate' },
+          month: { $month: '$transactions.datetime' },
+          year: { $year: '$transactions.datetime' },
         };
       }
       pipeline.push({

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import MyResponsivePie from "../PieChart/Pie";
 import Bar from "../BarGraph/Bar";
-import { useViewTransactionQuery as usePieApi } from "../../redux/services/analyseTransactionPieApi";
-import { useViewTransactionQuery as useBarApi } from "../../redux/services/analyseTransactionBarApi";
+import { useLazyViewTransactionQuery as usePieApi } from "../../redux/services/analyseTransactionPieApi";
+import { useLazyViewTransactionQuery as useBarApi } from "../../redux/services/analyseTransactionBarApi";
 import { BarData, BarNivoData, PieData, PieNivoData } from "../../interfaces/transaction";
 import "./styles.css";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query/fetchBaseQuery";
@@ -104,40 +104,31 @@ export const AnalyseExpense = () => {
   };
 
   const barQuery: BarQuery = { group: "bar" };
-  category !== "All" && (barQuery.category = category);
   type !== "All" && (barQuery.isDebit = type === "debit" ? true : false);
   period !== "All" && (barQuery.period = period);
 
   const creditPieQuery: PieQuery = { ...barQuery, group: "pie", isDebit: false };
   const debitPieQuery = { ...creditPieQuery, isDebit: true };
-  const { data: creditPieData, isLoading: isCreditPieLoading, error: creditPieFetchError } = usePieApi(creditPieQuery);
-  const { data: debitPieData, isLoading: isDebitPieLoading, error: debitPieFetchError } = usePieApi(debitPieQuery);
-  const { data: barApiData, isLoading: barLoading, error: barFetchError } = useBarApi(barQuery);
-  const stateDependencies = [
-    barApiData,
-    barLoading,
-    barFetchError,
-    creditPieData,
-    debitPieData,
-    isCreditPieLoading,
-    isDebitPieLoading,
-    creditPieFetchError,
-    debitPieFetchError,
-  ];
+  category !== "All" && (barQuery.category = category);
+  const [pieApiTrigger] = usePieApi();
+  const [barApiTrigger] = useBarApi();
+  const stateDependencies = [category, type, period];
   useEffect(() => {
-    if (isCreditPieLoading || isDebitPieLoading || barLoading) {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
-    console.log("Bar Data from API:  " + barApiData);
-    checkFetchError(barFetchError);
-    checkFetchError(creditPieFetchError);
-    checkFetchError(debitPieFetchError);
-
-    setNewPieData(creditPieData, "credit", setPieCredit);
-    setNewPieData(debitPieData, "debit", setPieDebit);
-    setNewBarData(barApiData);
+    pieApiTrigger(creditPieQuery).then((response: any) => {
+      if (response.data) {
+        setNewPieData(response.data.transactions, "credit", setPieCredit);
+      }
+    });
+    pieApiTrigger(debitPieQuery).then((response: any) => {
+      if (response.data) {
+        setNewPieData(response.data.transactions, "debit", setPieDebit);
+      }
+    });
+    barApiTrigger(barQuery).then((response: any) => {
+      if (response.data) {
+        setNewBarData(response.data.transactions);
+      }
+    });
   }, stateDependencies);
 
   const getColor = (category: string) => {
@@ -188,7 +179,7 @@ export const AnalyseExpense = () => {
       </div>
       <div className="barWrapper">
         <h1>Bar Graph</h1>
-        <div className="bar" style={{ width: `${200 + barData.length * 70}px` }}>
+        <div className="bar" style={{ width: `${250 + barData.length * 70}px` }}>
           <Bar data={barData} indexBy="date" labelBottom="Date" labelLeft="Money(in ₹)" keys={["debit", "credit"]} />
         </div>
       </div>

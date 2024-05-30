@@ -1,14 +1,12 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Transaction } from "../../interfaces/interface";
 import { BarData } from "../../interfaces/transaction";
-
 export const transactionApi = createApi({
   reducerPath: "transactionApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:5000/api",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
-      console.log(token);
       if (token) {
         headers.set("Authorization", `Bearer ${token.replace(/^"|"$/g, "")}`);
       }
@@ -27,9 +25,11 @@ export const transactionApi = createApi({
         customPeriodStart?: string;
         customPeriodEnd?: string;
         group?: string;
+        page?: number;
+        limit?: number;
       }
     >({
-      query: ({ category, isDebit, period, customPeriodStart, customPeriodEnd, group }) => {
+      query: ({ category, isDebit, period, customPeriodStart, customPeriodEnd, group, page = 1, limit = 10 }) => {
         const params = new URLSearchParams();
         if (category) params.append("category", category);
         if (isDebit !== undefined) params.append("isDebit", isDebit.toString());
@@ -37,8 +37,9 @@ export const transactionApi = createApi({
         if (customPeriodStart) params.append("customPeriodStart", customPeriodStart);
         if (customPeriodEnd) params.append("customPeriodEnd", customPeriodEnd);
         if (group) params.append("group", group);
+        params.append("page", page.toString());
+        params.append("limit", limit.toString());
         return {
-          // eslint-disable-next-line no-template-curly-in-string
           url: `/getTransactions?${params.toString()}`,
           method: "GET",
         };
@@ -47,4 +48,4 @@ export const transactionApi = createApi({
   }),
 });
 
-export const { useViewTransactionQuery } = transactionApi;
+export const { useLazyViewTransactionQuery } = transactionApi;
