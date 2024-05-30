@@ -137,15 +137,13 @@ export const ViewExpense = () => {
       );
 
       if (response.status === 200) {
-        const updatedTransaction = response.data.transactions[0]; // Assuming the response returns a single transaction
+        const updatedTransaction = response.data.transactions[0]; 
         console.log("Updated transaction from API:", updatedTransaction);
 
         setTransactions((prevTransactions) => {
-          // Clone the previous transactions to avoid direct state mutation
+          
           const newTransactions = prevTransactions.map((eachTransaction) => {
-            // Check if eachTransaction's nested transactions object matches the transactionId
             if (eachTransaction.transactions._id === transactionId) {
-              // Create a new object for the nested transactions to avoid mutating the original object
               return {
                 ...eachTransaction,
                 transactions: {

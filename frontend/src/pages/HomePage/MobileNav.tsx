@@ -71,11 +71,13 @@ const MobileNav: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
                 bg={useColorModeValue("white", "gray.900")}
                 borderColor={useColorModeValue("gray.200", "gray.700")}
               >
-                <Link to="/profile">
-                  {" "}
-                  <MenuItem>Profile</MenuItem>
-                </Link>
-                
+                <MenuItem
+                  onClick={() => {
+                    navigate("/profile");
+                  }}
+                >
+                  Profile
+                </MenuItem>
                 <MenuDivider />
                 <MenuItem onClick={openModal}>Sign out</MenuItem>
               </MenuList>

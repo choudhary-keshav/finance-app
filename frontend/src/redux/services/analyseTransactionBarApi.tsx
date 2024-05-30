@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Transaction } from "../../interfaces/interface";
+import { BarData } from "../../interfaces/transaction";
 export const transactionApi = createApi({
   reducerPath: "transactionApi",
   baseQuery: fetchBaseQuery({
@@ -16,7 +17,7 @@ export const transactionApi = createApi({
   }),
   endpoints: (builder) => ({
     viewTransaction: builder.query<
-      Transaction[],
+      BarData[],
       {
         category?: string;
         isDebit?: boolean;

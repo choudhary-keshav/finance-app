@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { TransactionModel as Transaction } from '../models/transactionModel';
 import mongoose from 'mongoose';
 
-
 export const getTransactions = async (req: Request, res: Response) => {
   const {
     category,
@@ -10,6 +9,7 @@ export const getTransactions = async (req: Request, res: Response) => {
     period,
     customPeriodStart,
     customPeriodEnd,
+    group,
     page = 1,
     limit = 10,
   } = req.query;
@@ -18,6 +18,13 @@ export const getTransactions = async (req: Request, res: Response) => {
 
   if (!userId) {
     return res.status(400).json({ message: 'User ID is required' });
+  }
+
+  function calculateDaysBetween(date1: Date, date2: Date) {
+    var date1_ms = date1.getTime();
+    var date2_ms = date2.getTime();
+    var difference_ms = Math.abs(date1_ms - date2_ms);
+    return Math.round(difference_ms / (1000 * 60 * 60 * 24));
   }
 
   const pipeline: any[] = [];
@@ -52,6 +59,16 @@ export const getTransactions = async (req: Request, res: Response) => {
     return new Date(year, month - 1, day);
   };
 
+  pipeline.push({
+    $addFields: {
+      'transactions.datetime': {
+        $dateFromString: {
+          dateString: '$transactions.transactionDate',
+          format: '%d-%m-%Y',
+        },
+      },
+    },
+  });
   if (period || (customPeriodStart && customPeriodEnd)) {
     const now = new Date();
 
@@ -87,23 +104,86 @@ export const getTransactions = async (req: Request, res: Response) => {
       matchDate.$lte = endDate;
     }
     if (startDate) {
-      pipeline.push(
-        {
-          $addFields: {
-            'transactions.dateString': {
-              $dateFromString: {
-                dateString: '$transactions.transactionDate',
-                format: '%d-%m-%Y',
+      pipeline.push({
+        $match: {
+          'transactions.datetime': matchDate,
+        },
+      });
+    }
+  }
+
+  if (group) {
+    if (group === 'pie') {
+      pipeline.push({
+        $group: {
+          _id: '$transactions.category',
+          credit: {
+            $sum: {
+              $cond: {
+                if: { $eq: ['$transactions.credit', ''] },
+                then: 0,
+                else: {
+                  $toInt: '$transactions.credit',
+                },
+              },
+            },
+          },
+          debit: {
+            $sum: {
+              $cond: {
+                if: { $eq: ['$transactions.debit', ''] },
+                then: 0,
+                else: {
+                  $toInt: '$transactions.debit',
+                },
               },
             },
           },
         },
-        {
-          $match: {
-            'transactions.dateString': matchDate,
+      });
+    }
+    if (group === 'bar') {
+      const groupStage: { _id: Object; credit: Object; debit: Object } = {
+        _id: {
+          day: { $dayOfMonth: { $toDate: '$transactions.datetime' } },
+        },
+        credit: {
+          $sum: {
+            $cond: {
+              if: { $eq: ['$transactions.credit', ''] },
+              then: 0,
+              else: {
+                $toInt: '$transactions.credit',
+              },
+            },
           },
         },
-      );
+        debit: {
+          $sum: {
+            $cond: {
+              if: { $eq: ['$transactions.debit', ''] },
+              then: 0,
+              else: {
+                $toInt: '$transactions.debit',
+              },
+            },
+          },
+        },
+      };
+
+      if (
+        period === undefined ||
+        period === 'thisYear' ||
+        (endDate && startDate && calculateDaysBetween(startDate, endDate) > 30)
+      ) {
+        groupStage._id = {
+          month: { $month: '$transactions.datetime' },
+          year: { $year: '$transactions.datetime' },
+        };
+      }
+      pipeline.push({
+        $group: groupStage,
+      });
     }
   }
 
@@ -112,11 +192,11 @@ export const getTransactions = async (req: Request, res: Response) => {
   pipeline.push({
     $facet: {
       totalData: [{ $skip: skip }, { $limit: Number(limit) }],
-      
+
       totalCount: [{ $count: 'count' }],
     },
   });
- 
+
   try {
     const result = await Transaction.aggregate(pipeline);
     const transactions = result[0].totalData;
@@ -129,7 +209,6 @@ export const getTransactions = async (req: Request, res: Response) => {
       totalPages,
       currentPage: Number(page),
     });
-   
   } catch (error) {
     console.error('Error fetching transactions:', error);
     res.status(500).json({ message: 'Internal server error' });
