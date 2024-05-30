@@ -58,7 +58,23 @@ export interface TransactionDetails {
   _id: string;
 }
 
+// export interface Transaction {
+  
+//   _id: string;
+//   userId: string;
+//   transactions: TransactionDetails;
+//   __v: number;
+// }
+
+
 export interface Transaction {
+  balance: number;
+  category: string;
+
+  description: string;
+  debit: number;
+  credit: number;
+  transactionDate: string;
   _id: string;
   userId: string;
   transactions: TransactionDetails;
