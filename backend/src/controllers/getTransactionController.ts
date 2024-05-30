@@ -10,9 +10,10 @@ export const getTransactions = async (req: Request, res: Response) => {
     customPeriodStart,
     customPeriodEnd,
     group,
-    page = 1,
-    limit = 10,
+    page,
+    limit,
   } = req.query;
+  console.log(req.query);
   const user = req.body.user.payload;
   const userId: string = user._id;
 
@@ -36,18 +37,6 @@ export const getTransactions = async (req: Request, res: Response) => {
   if (category) {
     matchStage['transactions.category'] = category;
     pipeline.push({ $match: matchStage });
-  }
-
-  if (isDebit !== undefined) {
-    if (isDebit === 'true') {
-      pipeline.push({
-        $match: { 'transactions.credit': '' },
-      });
-    } else {
-      pipeline.push({
-        $match: { 'transactions.debit': '' },
-      });
-    }
   }
 
   let startDate: Date | undefined;
@@ -108,6 +97,18 @@ export const getTransactions = async (req: Request, res: Response) => {
         $match: {
           'transactions.datetime': matchDate,
         },
+      });
+    }
+  }
+
+  if (isDebit) {
+    if (isDebit === 'true') {
+      pipeline.push({
+        $match: { 'transactions.credit': '' },
+      });
+    } else {
+      pipeline.push({
+        $match: { 'transactions.debit': '' },
       });
     }
   }
@@ -187,28 +188,27 @@ export const getTransactions = async (req: Request, res: Response) => {
     }
   }
 
-  const skip = (Number(page) - 1) * Number(limit);
-
-  pipeline.push({
-    $facet: {
-      totalData: [{ $skip: skip }, { $limit: Number(limit) }],
-
-      totalCount: [{ $count: 'count' }],
-    },
-  });
+  if (page && limit) {
+    const skip = (Number(page) - 1) * Number(limit);
+    pipeline.push({
+      $facet: {
+        totalData: [{ $skip: skip }, { $limit: Number(limit) }],
+        totalCount: [{ $count: 'count' }],
+      },
+    });
+  }
 
   try {
     const result = await Transaction.aggregate(pipeline);
-    const transactions = result[0].totalData;
-    const totalCount = result[0].totalCount[0]?.count || 0;
-    const totalPages = Math.ceil(totalCount / Number(limit));
-
-    res.status(200).json({
-      transactions,
-      totalCount,
-      totalPages,
-      currentPage: Number(page),
-    });
+    let returnedData: any = { transactions: result };
+    if (page && limit) {
+      const transactions = result[0].totalData;
+      const totalCount = result[0].totalCount[0]?.count || 0;
+      const totalPages = Math.ceil(totalCount / Number(limit));
+      const currentPage = Number(page);
+      returnedData = { transactions, totalCount, totalPages, currentPage };
+    }
+    res.status(200).json(returnedData);
   } catch (error) {
     console.error('Error fetching transactions:', error);
     res.status(500).json({ message: 'Internal server error' });

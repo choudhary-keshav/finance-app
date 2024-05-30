@@ -29,7 +29,7 @@ export const transactionApi = createApi({
         limit?: number;
       }
     >({
-      query: ({ category, isDebit, period, customPeriodStart, customPeriodEnd, group, page = 1, limit = 10 }) => {
+      query: ({ category, isDebit, period, customPeriodStart, customPeriodEnd, group }) => {
         const params = new URLSearchParams();
         if (category) params.append("category", category);
         if (isDebit !== undefined) params.append("isDebit", isDebit.toString());
@@ -37,8 +37,6 @@ export const transactionApi = createApi({
         if (customPeriodStart) params.append("customPeriodStart", customPeriodStart);
         if (customPeriodEnd) params.append("customPeriodEnd", customPeriodEnd);
         if (group) params.append("group", group);
-        params.append("page", page.toString());
-        params.append("limit", limit.toString());
         return {
           url: `/getTransactions?${params.toString()}`,
           method: "GET",

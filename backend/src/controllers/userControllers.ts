@@ -63,14 +63,16 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const updateUser = asyncHandler(async (req: Request, res: Response) => {
-  const { updatedName, updatedEmail, updatedPassword } = req.body;
+  const { updatedName, updatedEmail, updatedPassword } = req.query;
   const { email } = req.body.user.payload;
 
   if (!updatedName || !updatedEmail) {
     res.send('Name and email are necessary');
+    return;
   }
 
   const user = await User.findOne({ email });
+  console.log(user);
 
   if (!user) {
     res.status(404);
@@ -90,9 +92,9 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
     _id: updatedUser._id,
     name: updatedUser.name,
     email: updatedUser.email,
-    isAdmin: updateUser.isAdmin,
-    pic: updateUser.pic,
-    token: generateToken(updateUser),
+    isAdmin: updatedUser.isAdmin,
+    pic: updatedUser.pic,
+    token: generateToken(updatedUser),
   });
 });
 

@@ -1,12 +1,25 @@
 // install (please try to align the version of installed @nivo packages)
 // yarn add @nivo/bar
 import { ResponsiveBar } from "@nivo/bar";
+const BAR_VALUE_PADDING = 5;
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
 // no chart will be rendered.
 // website examples showcase many properties,
 // you'll often use just a few of them.
+
+const BarLabels = ({ bars }) => {
+  return (
+    <g>
+      {bars.map(({ width, x, y, data: { formattedValue } }) => (
+        <text key={`${x}.${y}`} x={x + width / 2} y={y - BAR_VALUE_PADDING} textAnchor="middle">
+          {formattedValue}
+        </text>
+      ))}
+    </g>
+  );
+};
 
 const MyResponsiveBar = ({ data, indexBy, labelBottom, labelLeft, keys /* see data tab */ }) => (
   <ResponsiveBar
@@ -33,7 +46,9 @@ const MyResponsiveBar = ({ data, indexBy, labelBottom, labelLeft, keys /* see da
     padding={0.3}
     valueScale={{ type: "linear" }}
     indexScale={{ type: "band", round: true }}
-    colors={{ scheme: "set1" }}
+    colors={{ scheme: "accent" }}
+    layers={["grid", "axes", "bars", BarLabels, "legends"]} // unlike @trymbill I just use the original bars and add the bar labels in a separate layer like @mkusold
+    enableLabel={false} // disable labels in the original bars
     defs={[
       {
         id: "dots",
@@ -84,12 +99,12 @@ const MyResponsiveBar = ({ data, indexBy, labelBottom, labelLeft, keys /* see da
       truncateTickAt: 0,
     }}
     axisLeft={{
-      tickSize: -10,
+      tickSize: -2,
       tickPadding: 0,
       tickRotation: 0,
       legend: labelLeft,
       legendPosition: "middle",
-      legendOffset: -50,
+      legendOffset: -52,
       truncateTickAt: 0,
     }}
     labelSkipWidth={12}
@@ -98,6 +113,7 @@ const MyResponsiveBar = ({ data, indexBy, labelBottom, labelLeft, keys /* see da
       from: "color",
       modifiers: [["darker", 1.6]],
     }}
+    enableTotals={true}
     legends={[
       {
         dataFrom: "keys",
