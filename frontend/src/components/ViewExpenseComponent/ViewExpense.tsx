@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { DateTime } from "luxon";
 import { Stack } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
@@ -8,12 +9,15 @@ import { Radio, RadioGroup, Button } from "@chakra-ui/react";
 import "./ViewExpense.styled.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import TransactionModal from "../../pages/modals/TransactionModal";
+import TransactionDeleteModal from "../../pages/modals/TransactionDeleteModal";
 import { TransactionDetails } from "../../interfaces/interface";
 
 export const ViewExpense = () => {
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedTransactionType, setSelectedTransactionType] = useState<boolean | undefined>(undefined);
+  const [selectedTransactionType, setSelectedTransactionType] = useState<
+    boolean | undefined
+  >(undefined);
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -31,7 +35,6 @@ export const ViewExpense = () => {
     amount: "",
     type: "",
     balance: "",
-
     category: "",
   });
 
@@ -48,8 +51,10 @@ export const ViewExpense = () => {
     period: selectedOption,
     category: selectedCategory,
     isDebit: selectedTransactionType,
-    customPeriodStart: selectedOption === "custom" ? formatDate(fromDate) : undefined,
-    customPeriodEnd: selectedOption === "custom" ? formatDate(toDate) : undefined,
+    customPeriodStart:
+      selectedOption === "custom" ? formatDate(fromDate) : undefined,
+    customPeriodEnd:
+      selectedOption === "custom" ? formatDate(toDate) : undefined,
     page: currentPage,
     limit: 10,
   };
@@ -61,7 +66,14 @@ export const ViewExpense = () => {
         setTransactions(response.data.transactions);
       }
     });
-  }, [selectedOption, selectedCategory, selectedTransactionType, fromDate, toDate, currentPage]);
+  }, [
+    selectedOption,
+    selectedCategory,
+    selectedTransactionType,
+    fromDate,
+    toDate,
+    currentPage,
+  ]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -80,7 +92,9 @@ export const ViewExpense = () => {
     setCurrentPage(1);
   };
 
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setSelectedCategory(event.target.value);
     setCurrentPage(1);
   };
@@ -99,7 +113,11 @@ export const ViewExpense = () => {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
-  const handleEditClick = (transaction: Transaction, transaction_id: string) => {
+
+  const handleEditClick = (
+    transaction: Transaction,
+    transaction_id: string
+  ) => {
     console.log(transaction._id);
     console.log(transaction_id);
     setUserId(transaction._id);
@@ -118,7 +136,9 @@ export const ViewExpense = () => {
     setIsEditing(true);
   };
 
-  const handleTransactionFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleTransactionFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setTransactionFormData({
       ...transactionFormData,
       [e.target.name]: e.target.value,
@@ -126,24 +146,29 @@ export const ViewExpense = () => {
     console.log(transactionFormData);
   };
 
-
   const handleTransactionFormSubmit = async () => {
     try {
       console.log("Data edited:", transactionFormData);
-
+      transactionFormData.transactionDate = DateTime.fromISO(
+        transactionFormData.transactionDate
+      ).toFormat("dd-MM-yyyy");
       const response = await axios.put(
         `http://localhost:5000/api/editTransaction/${userId}/${transactionId}`,
         transactionFormData
       );
 
       if (response.status === 200) {
-        const updatedTransaction = response.data.transactions[0]; 
+        const updatedTransaction = response.data.transactions[0];
         console.log("Updated transaction from API:", updatedTransaction);
 
         setTransactions((prevTransactions) => {
-          
           const newTransactions = prevTransactions.map((eachTransaction) => {
             if (eachTransaction.transactions._id === transactionId) {
+              console.log(
+                "i am updated date",
+                updatedTransaction.transactionDate
+              );
+
               return {
                 ...eachTransaction,
                 transactions: {
@@ -171,29 +196,71 @@ export const ViewExpense = () => {
     }
   };
 
-  useEffect(() => {
-    console.log("Transaction ID:", transactionId);
-    console.log("Transactions:", transactions);
+  const handleDeleteButton = (
+    transaction: Transaction,
+    transaction_id: string
+  ) => {
+    const userId = transaction._id;
+    const transactionId = transaction.transactions._id;
 
-    let updatedTransaction;
-    transactions.forEach((eachTransaction) => {
-      if (eachTransaction.transactions._id === transactionId) {
-        updatedTransaction = eachTransaction.transactions;
+    console.log("i am onclick:", userId, transactionId);
+
+    setUserId(userId);
+    setTransactionId(transactionId);
+
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDelete = async (userId: string, transactionId: string) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/api/deleteTransaction/${userId}/${transactionId}`
+      );
+
+      if (response.status === 200) {
+        console.log(
+          "Transaction with ID",
+          transactionId,
+          "deleted successfully."
+        );
+
+        setTransactions((prevTransactions) =>
+          prevTransactions.filter(
+            (eachTransaction) =>
+              eachTransaction.transactions._id !== transactionId
+          )
+        );
+
+        setIsDeleteModalOpen(false);
       }
-    });
-    console.log("Updated transaction in transactions:", updatedTransaction);
-  }, [transactions, transactionId]);
+    } catch (error) {
+      console.error(
+        `Error deleting transaction with ID ${transactionId}:`,
+        error
+      );
+    }
+  };
 
-  const handleCategoryNewTransaction = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleCategoryNewTransaction = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setTransactionFormData({
       ...transactionFormData,
       category: e.target.value,
     });
   };
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+
   return (
     <div className="viewExpense-main-container">
       <div className="viewExpense-sub-container">
-        <Select value={selectedOption} onChange={handleSelectChange} placeholder="All" width="250px">
+        <Select
+          value={selectedOption}
+          onChange={handleSelectChange}
+          placeholder="All"
+          width="250px"
+        >
           <option value="thisWeek">This Week</option>
           <option value="thisMonth">This Month</option>
           <option value="thisYear">This Year</option>
@@ -201,11 +268,26 @@ export const ViewExpense = () => {
         </Select>
         {selectedOption === "custom" && (
           <>
-            <input type="date" placeholder="from" value={fromDate} onChange={handleFromDateChange} />
-            <input type="date" placeholder="to" value={toDate} onChange={handleToDateChange} />
+            <input
+              type="date"
+              placeholder="from"
+              value={fromDate}
+              onChange={handleFromDateChange}
+            />
+            <input
+              type="date"
+              placeholder="to"
+              value={toDate}
+              onChange={handleToDateChange}
+            />
           </>
         )}
-        <Select value={selectedCategory} onChange={handleCategoryChange} placeholder="All" width="250px">
+        <Select
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          placeholder="All"
+          width="250px"
+        >
           <option value="food">Food</option>
           <option value="travel">Travel</option>
           <option value="other">Other</option>
@@ -234,22 +316,48 @@ export const ViewExpense = () => {
           <tbody>
             {transactions &&
               transactions.map((transaction: Transaction, i: number) => (
-                <tr>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.transactionDate}</td>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.description}</td>
+                <tr key={transaction.transactions._id}>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    {transaction.transactions.transactionDate}
+                  </td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    {transaction.transactions.description}
+                  </td>
                   {selectedTransactionType !== false && (
-                    <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.debit}</td>
+                    <td className={i % 2 === 0 ? "debit" : "credit"}>
+                      {transaction.transactions.debit}
+                    </td>
                   )}
                   {selectedTransactionType !== true && (
-                    <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.credit}</td>
+                    <td className={i % 2 === 0 ? "debit" : "credit"}>
+                      {transaction.transactions.credit}
+                    </td>
                   )}
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.balance}</td>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.category}</td>
                   <td className={i % 2 === 0 ? "debit" : "credit"}>
-                    <Button onClick={() => handleEditClick(transaction, transaction.transactions._id)}>
+                    {transaction.transactions.balance}
+                  </td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    {transaction.transactions.category}
+                  </td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    <Button
+                      onClick={() =>
+                        handleEditClick(
+                          transaction,
+                          transaction.transactions._id
+                        )
+                      }
+                    >
                       <EditIcon />
                     </Button>
-                    <Button>
+                    <Button
+                      onClick={() => {
+                        handleDeleteButton(
+                          transaction,
+                          transaction.transactions._id
+                        );
+                      }}
+                    >
                       <DeleteIcon />
                     </Button>
                   </td>
@@ -259,7 +367,10 @@ export const ViewExpense = () => {
         </table>
 
         <div className="pagination-controls">
-          <Button onClick={() => handlePageChange(currentPage - 1)} isDisabled={currentPage === 1}>
+          <Button
+            onClick={() => handlePageChange(currentPage - 1)}
+            isDisabled={currentPage === 1}
+          >
             {"<"}
           </Button>
           {Array.from({ length: totalPages }, (_, index) => (
@@ -267,16 +378,22 @@ export const ViewExpense = () => {
               key={index}
               onClick={() => handlePageChange(index + 1)}
               disabled={currentPage === index + 1}
-              className={currentPage === index + 1 ? "currentPage" : "otherPage"}
+              className={
+                currentPage === index + 1 ? "currentPage" : "otherPage"
+              }
             >
               {index + 1}
             </Button>
           ))}
-          <Button onClick={() => handlePageChange(currentPage + 1)} isDisabled={currentPage === totalPages}>
+          <Button
+            onClick={() => handlePageChange(currentPage + 1)}
+            isDisabled={currentPage === totalPages}
+          >
             {">"}
           </Button>
         </div>
       </div>
+
       <TransactionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -285,6 +402,12 @@ export const ViewExpense = () => {
         handleTransactionFormSubmit={handleTransactionFormSubmit}
         handleCategoryNewTransaction={handleCategoryNewTransaction}
         isEditing={isEditing}
+      />
+
+      <TransactionDeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onDelete={() => handleDelete(userId!, transactionId!)}
       />
     </div>
   );
