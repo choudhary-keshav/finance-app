@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Stack } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
@@ -7,19 +8,26 @@ import { Radio, RadioGroup, Button } from "@chakra-ui/react";
 import "./ViewExpense.styled.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import TransactionModal from "../../pages/modals/TransactionModal";
+import { TransactionDetails } from "../../interfaces/interface";
 
 export const ViewExpense = () => {
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedTransactionType, setSelectedTransactionType] = useState<boolean | undefined>(undefined);
+  const [selectedTransactionType, setSelectedTransactionType] = useState<
+    boolean | undefined
+  >(undefined);
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string>();
+  const [transactionId, setTransactionId] = useState<string>();
   const [transactionFormData, setTransactionFormData] = useState({
+    userId: "",
+    transactionId: "",
     transactionDate: "",
     description: "",
     amount: "",
@@ -41,8 +49,10 @@ export const ViewExpense = () => {
     period: selectedOption,
     category: selectedCategory,
     isDebit: selectedTransactionType,
-    customPeriodStart: selectedOption === "custom" ? formatDate(fromDate) : undefined,
-    customPeriodEnd: selectedOption === "custom" ? formatDate(toDate) : undefined,
+    customPeriodStart:
+      selectedOption === "custom" ? formatDate(fromDate) : undefined,
+    customPeriodEnd:
+      selectedOption === "custom" ? formatDate(toDate) : undefined,
     page: currentPage,
     limit: 10,
   };
@@ -54,7 +64,14 @@ export const ViewExpense = () => {
         setTransactions(response.data.transactions);
       }
     });
-  }, [selectedOption, selectedCategory, selectedTransactionType, fromDate, toDate, currentPage]);
+  }, [
+    selectedOption,
+    selectedCategory,
+    selectedTransactionType,
+    fromDate,
+    toDate,
+    currentPage,
+  ]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -73,7 +90,9 @@ export const ViewExpense = () => {
     setCurrentPage(1);
   };
 
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setSelectedCategory(event.target.value);
     setCurrentPage(1);
   };
@@ -92,8 +111,17 @@ export const ViewExpense = () => {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
-  const handleEditClick = (transaction: Transaction) => {
+  const handleEditClick = (
+    transaction: Transaction,
+    transaction_id: string
+  ) => {
+    console.log(transaction._id);
+    console.log(transaction_id);
+    setUserId(transaction._id);
+    setTransactionId(transaction_id);
     setTransactionFormData({
+      userId: transaction._id,
+      transactionId: transaction.transactions._id,
       transactionDate: transaction.transactions.transactionDate,
       description: transaction.transactions.description,
       amount: transaction.transactions.debit || transaction.transactions.credit,
@@ -102,10 +130,12 @@ export const ViewExpense = () => {
       category: transaction.transactions.category,
     });
     setIsModalOpen(true);
-     setIsEditing(true);
+    setIsEditing(true);
   };
 
-  const handleTransactionFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleTransactionFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setTransactionFormData({
       ...transactionFormData,
       [e.target.name]: e.target.value,
@@ -113,12 +143,262 @@ export const ViewExpense = () => {
     console.log(transactionFormData);
   };
 
-  const handleTransactionFormSubmit = () => {
-    console.log("data edited",transactionFormData)
-    setIsModalOpen(false);
-  };
+  // const handleTransactionFormSubmit = async () => {
+  //   try {
+  //     console.log("data edited", transactionFormData);
 
-  const handleCategoryNewTransaction = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  //     const response = await axios.put(
+  //       `http://localhost:5000/api/editTransaction/${userId}/${transactionId}`,
+  //       transactionFormData
+  //     );
+
+  //     if (response.status === 200) {
+  //       const updatedTransaction = response.data;
+
+  //       setTransactions((prevTransactions) =>
+  //         prevTransactions.map((transaction) =>
+  //           transaction._id === updatedTransaction.userId
+  //             ? {
+  //                 ...transaction,
+  //                 transactions: {
+  //                   ...transaction.transactions,
+  //                   transactionDate: updatedTransaction.transactionDate,
+  //                   description: updatedTransaction.description,
+  //                   debit: updatedTransaction.debit,
+  //                   credit: updatedTransaction.credit,
+  //                   balance: updatedTransaction.balance,
+  //                   category: updatedTransaction.category,
+  //                 },
+  //               }
+  //             : transaction
+  //         )
+  //       );
+
+  //       setTimeout(()=>{
+  //         console.log(transactions)
+  //       },5000)
+
+  //       setIsModalOpen(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating transaction:", error);
+  //   }
+  // };
+
+  // const handleTransactionFormSubmit = async () => {
+  //   try {
+  //     console.log("data edited", transactionFormData);
+
+  //     const response = await axios.put(
+  //       `http://localhost:5000/api/editTransaction/${userId}/${transactionId}`,
+  //       transactionFormData
+  //     );
+
+  //     if (response.status === 200) {
+  //       const updatedTransaction = response.data.transactions[0]; // Assuming the response returns a single transaction
+
+  //       setTransactions((prevTransactions) =>
+  //         prevTransactions.map((transaction) =>
+  //           transaction._id === updatedTransaction._id
+  //             ? {
+  //                 ...transaction,
+  //                 transactionDate: updatedTransaction.transactionDate,
+  //                 description: updatedTransaction.description,
+  //                 debit: updatedTransaction.debit,
+  //                 credit: updatedTransaction.credit,
+  //                 balance: updatedTransaction.balance,
+  //                 category: updatedTransaction.category,
+  //               }
+  //             : transaction
+  //         )
+  //       );
+  //       console.log(transactions[0])
+  //       console.log(updatedTransaction)
+
+  //       setIsModalOpen(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating transaction:", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   console.log(transactions); // This will log the updated state
+  // }, [transactions]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//   const handleTransactionFormSubmit = async () => {
+//     try {
+//       console.log("data edited", transactionFormData);
+
+//       const response = await axios.put(
+//         `http://localhost:5000/api/editTransaction/${userId}/${transactionId}`,
+//         transactionFormData
+//       );
+
+//       if (response.status === 200) {
+//         const updatedTransaction = response.data.transactions[0]; // Assuming the response returns a single transaction
+
+
+// setTransactions((prevTransactions) => {
+//   const newTransactions = [...prevTransactions];
+//   newTransactions.forEach((transaction, index) => {
+//     if (transaction._id === updatedTransaction._id) {
+//       newTransactions[index] = {
+//         ...transaction,
+//         transactionDate: updatedTransaction.transactionDate,
+//         description: updatedTransaction.description,
+//         debit: updatedTransaction.debit,
+//         credit: updatedTransaction.credit,
+//         balance: updatedTransaction.balance,
+//         category: updatedTransaction.category,
+//       };
+//     }
+//   });
+//   return newTransactions;
+// });
+
+//         setIsModalOpen(false);
+//       }
+//     } catch (error) {
+//       console.error("Error updating transaction:", error);
+//     }
+//   };
+// useEffect(() => {
+//   console.log("Transaction ID:", transactionId);
+//   console.log("Transactions:", transactions);
+
+//   const updatedTransaction = transactions.find((t) => t._id === transactionId);
+//   console.log("Updated transaction in transactions:", updatedTransaction);
+// }, [transactions, transactionId]);
+
+
+
+const handleTransactionFormSubmit = async () => {
+  try {
+    console.log("Data edited:", transactionFormData);
+
+    const response = await axios.put(
+      `http://localhost:5000/api/editTransaction/${userId}/${transactionId}`,
+      transactionFormData
+    );
+
+    if (response.status === 200) {
+      const updatedTransaction = response.data.transactions[0]; // Assuming the response returns a single transaction
+      console.log("Updated transaction from API:", updatedTransaction);
+
+      setTransactions((prevTransactions) => {
+        // Clone the previous transactions to avoid direct state mutation
+        const newTransactions = prevTransactions.map((eachTransaction) => {
+          // Check if eachTransaction's nested transactions object matches the transactionId
+          if (eachTransaction.transactions._id === transactionId) {
+            // Create a new object for the nested transactions to avoid mutating the original object
+            return {
+              ...eachTransaction,
+              transactions: {
+                ...eachTransaction.transactions,
+                description: updatedTransaction.description,
+                debit: updatedTransaction.debit,
+                credit: updatedTransaction.credit,
+                transactionDate: updatedTransaction.transactionDate,
+                balance: updatedTransaction.balance,
+                category: updatedTransaction.category,
+              },
+            };
+          }
+          return eachTransaction;
+        });
+
+        console.log("Updated transactions:", newTransactions);
+        return newTransactions;
+      });
+
+      setIsModalOpen(false);
+    }
+  } catch (error) {
+    console.error("Error updating transaction:", error);
+  }
+};
+
+useEffect(() => {
+  console.log("Transaction ID:", transactionId);
+  console.log("Transactions:", transactions);
+
+  let updatedTransaction;
+  transactions.forEach((eachTransaction) => {
+    if (eachTransaction.transactions._id === transactionId) {
+      updatedTransaction = eachTransaction.transactions;
+    }
+  });
+  console.log("Updated transaction in transactions:", updatedTransaction);
+}, [transactions, transactionId]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  const handleCategoryNewTransaction = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setTransactionFormData({
       ...transactionFormData,
       category: e.target.value,
@@ -127,7 +407,12 @@ export const ViewExpense = () => {
   return (
     <div className="viewExpense-main-container">
       <div className="viewExpense-sub-container">
-        <Select value={selectedOption} onChange={handleSelectChange} placeholder="All" width="250px">
+        <Select
+          value={selectedOption}
+          onChange={handleSelectChange}
+          placeholder="All"
+          width="250px"
+        >
           <option value="thisWeek">This Week</option>
           <option value="thisMonth">This Month</option>
           <option value="thisYear">This Year</option>
@@ -135,11 +420,26 @@ export const ViewExpense = () => {
         </Select>
         {selectedOption === "custom" && (
           <>
-            <input type="date" placeholder="from" value={fromDate} onChange={handleFromDateChange} />
-            <input type="date" placeholder="to" value={toDate} onChange={handleToDateChange} />
+            <input
+              type="date"
+              placeholder="from"
+              value={fromDate}
+              onChange={handleFromDateChange}
+            />
+            <input
+              type="date"
+              placeholder="to"
+              value={toDate}
+              onChange={handleToDateChange}
+            />
           </>
         )}
-        <Select value={selectedCategory} onChange={handleCategoryChange} placeholder="All" width="250px">
+        <Select
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          placeholder="All"
+          width="250px"
+        >
           <option value="food">Food</option>
           <option value="travel">Travel</option>
           <option value="other">Other</option>
@@ -169,18 +469,37 @@ export const ViewExpense = () => {
             {transactions &&
               transactions.map((transaction: Transaction, i: any) => (
                 <tr>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.transactionDate}</td>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.description}</td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    {transaction.transactions.transactionDate}
+                  </td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    {transaction.transactions.description}
+                  </td>
                   {selectedTransactionType !== false && (
-                    <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.debit}</td>
+                    <td className={i % 2 === 0 ? "debit" : "credit"}>
+                      {transaction.transactions.debit}
+                    </td>
                   )}
                   {selectedTransactionType !== true && (
-                    <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.credit}</td>
+                    <td className={i % 2 === 0 ? "debit" : "credit"}>
+                      {transaction.transactions.credit}
+                    </td>
                   )}
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.balance}</td>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>{transaction.transactions.category}</td>
                   <td className={i % 2 === 0 ? "debit" : "credit"}>
-                    <Button onClick={() => handleEditClick(transaction)}>
+                    {transaction.transactions.balance}
+                  </td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    {transaction.transactions.category}
+                  </td>
+                  <td className={i % 2 === 0 ? "debit" : "credit"}>
+                    <Button
+                      onClick={() =>
+                        handleEditClick(
+                          transaction,
+                          transaction.transactions._id
+                        )
+                      }
+                    >
                       <EditIcon />
                     </Button>
                     <Button>
@@ -193,7 +512,10 @@ export const ViewExpense = () => {
         </table>
 
         <div className="pagination-controls">
-          <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+          <Button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
             {"<"}
           </Button>
           {Array.from({ length: totalPages }, (_, index) => (
@@ -201,12 +523,17 @@ export const ViewExpense = () => {
               key={index}
               onClick={() => handlePageChange(index + 1)}
               disabled={currentPage === index + 1}
-              className={currentPage === index + 1 ? "currentPage" : "otherPage"}
+              className={
+                currentPage === index + 1 ? "currentPage" : "otherPage"
+              }
             >
               {index + 1}
             </Button>
           ))}
-          <Button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+          <Button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
             {">"}
           </Button>
         </div>
