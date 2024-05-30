@@ -31,7 +31,6 @@ export const ViewExpense = () => {
     amount: "",
     type: "",
     balance: "",
-
     category: "",
   });
 
@@ -206,7 +205,7 @@ export const ViewExpense = () => {
           </>
         )}
         <Select value={selectedCategory} onChange={handleCategoryChange} placeholder="All" width="250px">
-          <option value="food">Food</option>
+          <option value="Food">Food</option>
           <option value="travel">Travel</option>
           <option value="other">Other</option>
         </Select>

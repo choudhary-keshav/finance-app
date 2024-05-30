@@ -1,7 +1,7 @@
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Table, Thead, Tbody, Tr, Th, Td, Box } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { DateTime } from "luxon";
 import { Select, Button, Input, FormControl, FormLabel, useDisclosure } from "@chakra-ui/react";
@@ -10,6 +10,7 @@ import { jwtDecode } from "jwt-decode";
 import TransactionModal from "../../pages/modals/TransactionModal";
 import { isDisabled, isEditable } from "@testing-library/user-event/dist/utils";
 import "./UploadExcel.styled.css";
+import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
 
 interface TransactionFormData {
   transactionDate: string;
@@ -19,11 +20,28 @@ interface TransactionFormData {
   balance: string;
   category: string;
 }
+export interface TransactionDetails {
+  transactionDate: string;
+  description: string;
+  debit: string;
+  credit: string;
+  balance: string;
+  category: string;
+  _id: string;
+}
 
+export interface Transaction {
+  _id: string;
+  userId: string;
+  transactions: TransactionDetails;
+  __v: number;
+}
 const UploadExcel: React.FC = () => {
   const [excelData, setExcelData] = useState<(string | null | undefined)[][]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isFileUploaded, setIsFileUploaded] = useState<boolean>(false);
+  const [totalBalance, setTotalBalance] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [transactionFormData, setTransactionFormData] = useState<TransactionFormData>({
     transactionDate: "",
     description: "",
@@ -32,8 +50,42 @@ const UploadExcel: React.FC = () => {
     balance: "",
     category: "",
   });
-
+  const [trigger] = useLazyViewTransactionQuery();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  useEffect(() => {
+    const fetchAllPages = async () => {
+      let latestBalance = 0;
+
+      try {
+        const initialQueryParams = { page: 1, limit: 10 };
+        const initialResponse = await trigger(initialQueryParams);
+        const initialData: any = initialResponse.data;
+        console.log(initialData);
+        const pages = initialData.totalPages;
+        setTotalPages(pages);
+
+        for (let page = 1; page <= pages; page++) {
+          const queryParams = { page, limit: 10 };
+          const response = await trigger(queryParams);
+          const data: any = response.data;
+          const transactions: Transaction[] = data.transactions;
+
+          // eslint-disable-next-line no-loop-func, array-callback-return
+          transactions.map((transaction) => {
+            const { balance } = transaction.transactions;
+            latestBalance = parseFloat(balance);
+            console.log(latestBalance)
+          });
+        }
+
+        setTotalBalance(latestBalance);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchAllPages();
+  }, [trigger]);
 
   const serialNumberToDate = (serialNumber: number): string => {
     const millisecondsSinceUnixEpoch = (serialNumber - 25569) * 86400 * 1000;
@@ -273,7 +325,7 @@ const UploadExcel: React.FC = () => {
                           onChange={(e) => handleCategoryChange(rowIndex, e.target.value)}
                           placeholder="Select category"
                         >
-                          <option value="food">Food</option>
+                          <option value="Food">Food</option>
                           <option value="travel">Travel</option>
                           <option value="other">Other</option>
                         </Select>
@@ -287,6 +339,7 @@ const UploadExcel: React.FC = () => {
         </div>
       )}
       <TransactionModal
+        totalBalance={totalBalance}
         isOpen={isOpen}
         onClose={onClose}
         transactionFormData={transactionFormData}

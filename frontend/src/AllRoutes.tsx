@@ -10,7 +10,7 @@ const AllRoutes = () => {
   return (
     <div className="AllRoutes" style={{ width: "100%" }}>
       <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/upload" element={<UploadExcel />} />
         <Route path="/view" element={<ViewExpense />} />
         <Route path="/analyse" element={<AnalyseExpense />} />

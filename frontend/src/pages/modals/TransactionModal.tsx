@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FormControl,
   FormLabel,
@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 
 interface TransactionModalProps {
+  totalBalance?: number|null;
   isOpen: boolean;
   onClose: () => void;
   transactionFormData: {
@@ -32,6 +33,7 @@ interface TransactionModalProps {
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({
+  totalBalance,
   isOpen,
   onClose,
   transactionFormData,
@@ -40,6 +42,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   handleCategoryNewTransaction,
   isEditing
 }) => {
+  const [balance, setBalance] = useState<any>(totalBalance)
+  console.log(balance)
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -82,7 +86,24 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             <Select
               name="type"
               value={transactionFormData.type}
-              onChange={handleTransactionFormChange}
+              onChange={(e)=>{
+                handleTransactionFormChange(e)
+                console.log(e.target.value)
+                console.log(transactionFormData)
+                if(Number(transactionFormData.amount)){
+                  if(e.target.value === 'debit'){
+                    let temp = Number(totalBalance) - Number(transactionFormData.amount)
+                    transactionFormData.balance = String(temp)
+                    setBalance(temp)
+                  }
+                  else if(e.target.value === 'credit'){
+                    let temp = Number(totalBalance) + Number(transactionFormData.amount)
+                    transactionFormData.balance = String(temp)
+                    setBalance(temp)
+                  }
+                  console.log(transactionFormData)
+                }
+              }}
               placeholder="Select type"
             >
               <option value="debit">Debit</option>
@@ -94,8 +115,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             <Input
               type="text"
               name="balance"
-              value={transactionFormData.balance}
-              onChange={handleTransactionFormChange}
+              value={balance}
+              // onChange={handleTransactionFormChange}
               placeholder="Balance"
             />
           </FormControl>
