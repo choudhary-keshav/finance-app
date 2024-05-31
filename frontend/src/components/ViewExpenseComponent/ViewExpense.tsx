@@ -275,7 +275,7 @@ export const ViewExpense = () => {
           placeholder="All"
           width="250px"
         >
-          <option value="food">Food</option>
+          <option value="Food">Food</option>
           <option value="travel">Travel</option>
           <option value="other">Other</option>
         </Select>

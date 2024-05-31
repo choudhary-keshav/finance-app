@@ -7,6 +7,7 @@ import { BarData, BarNivoData, PieData, PieNivoData } from "../../interfaces/tra
 import "./styles.css";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query/fetchBaseQuery";
 import { SerializedError } from "@reduxjs/toolkit";
+import { Select } from "@chakra-ui/react";
 
 interface PieQuery {
   category?: string;
@@ -144,43 +145,52 @@ export const AnalyseExpense = () => {
 
   return (
     <div>
-      <h1>Number List</h1>
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}
-      <label htmlFor="category">Category: </label>
-      <select name="category" id="category" value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option value="All">All</option>
-        <option value="food">Food</option>
-        <option value="travel">Travel</option>
-        <option value="other">Other</option>
-      </select>
-      <label htmlFor="type">Type: </label>
-      <select name="type" id="type" value={type} onChange={(e) => setType(e.target.value)}>
-        <option value="All">All</option>
-        <option value="debit">Debit</option>
-        <option value="credit">Credit</option>
-      </select>
-      <label htmlFor="Period">Period: </label>
-      <select name="period" id="period" value={period} onChange={(e) => setPeriod(e.target.value)}>
-        <option value="All">All</option>
-        <option value="thisWeek">thisWeek</option>
-        <option value="thisMonth">thisMonth</option>
-        <option value="thisYear">thisYear</option>
-      </select>
-      <div className="flexDiv">
-        <div className="pie">
-          <h1>Credit Category Chart</h1>
+      <div className="chakraSelect">
+        <label htmlFor="Period">Period: </label>
+        <Select name="period" id="period" value={period} onChange={(e) => setPeriod(e.target.value)}>
+          <option value="All">All</option>
+          <option value="thisWeek">thisWeek</option>
+          <option value="thisMonth">thisMonth</option>
+          <option value="thisYear">thisYear</option>
+        </Select>
+      </div>
+      <h3>Category Charts</h3>
+      <div className="flexDiv piesContainer">
+        <div className="pie leftPie">
+          <h4>Credit</h4>
           <MyResponsivePie data={pieCredit} />
         </div>
         <div className="pie">
-          <h1>Debit Category Chart</h1>
+          <h4>Debit </h4>
           <MyResponsivePie data={pieDebit} />
         </div>
       </div>
+      <div className="flexDiv bottomCategories">
+        <div className="chakraSelect">
+          <label htmlFor="type">Type: </label>
+          <Select name="type" id="type" value={type} onChange={(e) => setType(e.target.value)}>
+            <option value="All">All</option>
+            <option value="debit">Debit</option>
+            <option value="credit">Credit</option>
+          </Select>
+        </div>
+        <div className="chakraSelect">
+          <label htmlFor="category">Category: </label>
+          <Select name="category" id="category" value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="All">All</option>
+            <option value="food">Food</option>
+            <option value="travel">Travel</option>
+            <option value="other">Other</option>
+          </Select>
+        </div>
+      </div>
+      <br />
+      <h2>Bar Graph</h2>
       <div className="barWrapper">
-        <h1>Bar Graph</h1>
         <div className="bar" style={{ width: `${250 + barData.length * 70}px` }}>
-          <Bar data={barData} indexBy="date" labelBottom="Date" labelLeft="Money(in ₹)" keys={["debit", "credit"]} />
+          <Bar data={barData} indexBy="date" labelBottom="Date" labelLeft="Money (in ₹)" keys={["credit", "debit"]} />
         </div>
       </div>
     </div>

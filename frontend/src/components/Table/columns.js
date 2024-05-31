@@ -1,14 +1,4 @@
-import React from 'react';
-  
-  const Columns = () =>  {
-	return (
-	  <div>
-	  </div>
-	);
-  }
-  
-  export default Columns;
-  export const COLUMNS = [
+export const COLUMNS = [
   {
     Header: "Date",
     accessor: "transactions.transactionDate",

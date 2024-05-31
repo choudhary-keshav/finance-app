@@ -80,3 +80,11 @@ export interface Transaction {
   transactions: TransactionDetails;
   __v: number;
 }
+
+export interface UpdatedUser {
+  _id: string;
+  name: string;
+  email: string;
+  pic: string;
+  token: string;
+}

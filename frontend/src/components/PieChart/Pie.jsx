@@ -1,15 +1,38 @@
+// install (please try to align the version of installed @nivo packages)
+// yarn add @nivo/pie
 import { ResponsivePie } from "@nivo/pie";
 
+// make sure parent container have a defined height when using
+// responsive component, otherwise height will be 0 and
+// no chart will be rendered.
+// website examples showcase many properties,
+// you'll often use just a few of them.
 const MyResponsivePie = ({ data /* see data tab */ }) => {
   console.log(data);
   return (
     <ResponsivePie
       data={data}
+      theme={{
+        text: { fontSize: 14 },
+        axis: {
+          legend: {
+            text: {
+              fontSize: 22,
+            },
+          },
+          ticks: {
+            text: {
+              fontSize: 16,
+            },
+          },
+        },
+      }}
+      colors={{ scheme: "accent" }}
       margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
-      innerRadius={0.5}
+      innerRadius={0.4}
       padAngle={0.7}
       sortByValue={true}
-      cornerRadius={3}
+      cornerRadius={0}
       activeOuterRadiusOffset={8}
       borderWidth={1}
       borderColor={{
