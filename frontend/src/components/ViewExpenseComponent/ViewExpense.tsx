@@ -118,8 +118,6 @@ export const ViewExpense = () => {
     transaction: Transaction,
     transaction_id: string
   ) => {
-    console.log(transaction._id);
-    console.log(transaction_id);
     setUserId(transaction._id);
     setTransactionId(transaction_id);
     setTransactionFormData({
@@ -143,12 +141,10 @@ export const ViewExpense = () => {
       ...transactionFormData,
       [e.target.name]: e.target.value,
     });
-    console.log(transactionFormData);
   };
 
   const handleTransactionFormSubmit = async () => {
     try {
-      console.log("Data edited:", transactionFormData);
       transactionFormData.transactionDate = DateTime.fromISO(
         transactionFormData.transactionDate
       ).toFormat("dd-MM-yyyy");
@@ -159,16 +155,10 @@ export const ViewExpense = () => {
 
       if (response.status === 200) {
         const updatedTransaction = response.data.transactions[0];
-        console.log("Updated transaction from API:", updatedTransaction);
 
         setTransactions((prevTransactions) => {
           const newTransactions = prevTransactions.map((eachTransaction) => {
             if (eachTransaction.transactions._id === transactionId) {
-              console.log(
-                "i am updated date",
-                updatedTransaction.transactionDate
-              );
-
               return {
                 ...eachTransaction,
                 transactions: {
@@ -185,7 +175,6 @@ export const ViewExpense = () => {
             return eachTransaction;
           });
 
-          console.log("Updated transactions:", newTransactions);
           return newTransactions;
         });
 
@@ -202,8 +191,6 @@ export const ViewExpense = () => {
   ) => {
     const userId = transaction._id;
     const transactionId = transaction.transactions._id;
-
-    console.log("i am onclick:", userId, transactionId);
 
     setUserId(userId);
     setTransactionId(transactionId);
