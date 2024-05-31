@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-
+  // const token = localStorage.getItem('token');
   if (!token) {
     return res.status(401).send('Unauthorized');
   }
@@ -20,22 +20,6 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
 };
 
 module.exports = authenticateToken;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { Request, Response, NextFunction } from 'express';
 // import jwt, { VerifyErrors } from 'jsonwebtoken';
@@ -69,5 +53,3 @@ module.exports = authenticateToken;
 // };
 
 // export default authenticateToken;
-
-

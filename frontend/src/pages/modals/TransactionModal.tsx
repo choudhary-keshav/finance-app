@@ -3,6 +3,9 @@ import {
   FormControl,
   FormLabel,
   Input,
+  RadioGroup,
+  Radio,
+  Stack,
   Select,
   Modal,
   ModalOverlay,
@@ -26,9 +29,13 @@ interface TransactionModalProps {
     balance: string;
     category: string;
   };
-  handleTransactionFormChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleTransactionFormChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
   handleTransactionFormSubmit: () => void;
-  handleCategoryNewTransaction: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleCategoryNewTransaction: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
   isEditing: boolean;
 }
 
@@ -40,7 +47,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   handleTransactionFormChange,
   handleTransactionFormSubmit,
   handleCategoryNewTransaction,
-  isEditing
+  isEditing,
 }) => {
   const [balance, setBalance] = useState<any>(totalBalance)
   console.log(balance)
@@ -48,7 +55,9 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>{isEditing ? "Edit Transaction" : "Add Transaction"}</ModalHeader>
+        <ModalHeader>
+          {isEditing ? "Edit Transaction" : "Add Transaction"}
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <FormControl>
@@ -83,32 +92,20 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           </FormControl>
           <FormControl>
             <FormLabel>Type</FormLabel>
-            <Select
+            <RadioGroup
               name="type"
               value={transactionFormData.type}
-              onChange={(e)=>{
-                handleTransactionFormChange(e)
-                console.log(e.target.value)
-                console.log(transactionFormData)
-                if(Number(transactionFormData.amount)){
-                  if(e.target.value === 'debit'){
-                    let temp = Number(totalBalance) - Number(transactionFormData.amount)
-                    transactionFormData.balance = String(temp)
-                    setBalance(temp)
-                  }
-                  else if(e.target.value === 'credit'){
-                    let temp = Number(totalBalance) + Number(transactionFormData.amount)
-                    transactionFormData.balance = String(temp)
-                    setBalance(temp)
-                  }
-                  console.log(transactionFormData)
-                }
-              }}
-              placeholder="Select type"
+              onChange={(value) =>
+                handleTransactionFormChange({
+                  target: { name: "type", value },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
             >
-              <option value="debit">Debit</option>
-              <option value="credit">Credit</option>
-            </Select>
+              <Stack direction="row">
+                <Radio value="debit">Debit</Radio>
+                <Radio value="credit">Credit</Radio>
+              </Stack>
+            </RadioGroup>
           </FormControl>
           <FormControl>
             <FormLabel>Balance</FormLabel>
@@ -135,7 +132,11 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={handleTransactionFormSubmit} colorScheme="blue" mr={3}>
+          <Button
+            onClick={handleTransactionFormSubmit}
+            colorScheme="blue"
+            mr={3}
+          >
             {isEditing ? "Edit Transaction" : "Add Transaction"}
           </Button>
           <Button onClick={onClose}>Cancel</Button>
