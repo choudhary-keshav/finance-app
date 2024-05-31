@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FormControl,
   FormLabel,
@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 
 interface TransactionModalProps {
-  totalBalance?: number|null;
+  totalBalance?: number | null;
   isOpen: boolean;
   onClose: () => void;
   transactionFormData: {
@@ -29,13 +29,9 @@ interface TransactionModalProps {
     balance: string;
     category: string;
   };
-  handleTransactionFormChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => void;
+  handleTransactionFormChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleTransactionFormSubmit: () => void;
-  handleCategoryNewTransaction: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => void;
+  handleCategoryNewTransaction: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   isEditing: boolean;
 }
 
@@ -49,15 +45,37 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   handleCategoryNewTransaction,
   isEditing,
 }) => {
-  const [balance, setBalance] = useState<any>(totalBalance)
-  console.log(balance)
+  const [balance, setBalance] = useState<any>(totalBalance);
+
+  useEffect(() => {
+    setBalance(totalBalance);
+  }, [totalBalance]);
+
+  useEffect(() => {
+    transactionFormData.balance = String(balance);
+  }, [balance, transactionFormData]);
+
+  const handleTypeChange = (value: string) => {
+    handleTransactionFormChange({
+      target: { name: "type", value },
+    } as React.ChangeEvent<HTMLInputElement>);
+
+    if (Number(transactionFormData.amount)) {
+      let temp;
+      if (value === "credit") {
+        temp = Number(balance) + Number(transactionFormData.amount);
+      } else if (value === "debit") {
+        temp = Number(balance) - Number(transactionFormData.amount);
+      }
+      setBalance(temp);
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>
-          {isEditing ? "Edit Transaction" : "Add Transaction"}
-        </ModalHeader>
+        <ModalHeader>{isEditing ? "Edit Transaction" : "Add Transaction"}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <FormControl>
@@ -95,11 +113,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             <RadioGroup
               name="type"
               value={transactionFormData.type}
-              onChange={(value) =>
-                handleTransactionFormChange({
-                  target: { name: "type", value },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
+              onChange={(e) => handleTypeChange(e as unknown as string)}
             >
               <Stack direction="row">
                 <Radio value="debit">Debit</Radio>
@@ -113,7 +127,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               type="text"
               name="balance"
               value={balance}
-              // onChange={handleTransactionFormChange}
+              onChange={handleTransactionFormChange}
               placeholder="Balance"
             />
           </FormControl>
@@ -132,11 +146,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Button
-            onClick={handleTransactionFormSubmit}
-            colorScheme="blue"
-            mr={3}
-          >
+          <Button onClick={handleTransactionFormSubmit} colorScheme="blue" mr={3}>
             {isEditing ? "Edit Transaction" : "Add Transaction"}
           </Button>
           <Button onClick={onClose}>Cancel</Button>
