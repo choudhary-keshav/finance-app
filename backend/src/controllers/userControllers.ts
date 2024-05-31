@@ -63,11 +63,11 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const updateUser = asyncHandler(async (req: Request, res: Response) => {
-  const { updatedName, updatedEmail, updatedPassword } = req.query;
+  const { updatedName, updatedPassword } = req.query;
   const { email } = req.body.user.payload;
 
-  if (!updatedName || !updatedEmail) {
-    res.send('Name and email are necessary');
+  if (!updatedName && !updatedPassword) {
+    res.send('No name or password given');
     return;
   }
 
@@ -79,8 +79,9 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
     throw new Error('User Not Found');
   }
 
-  user.name = updatedName || user.name;
-  user.email = updatedEmail || user.email;
+  if (updatedName) {
+    user.name = updatedName;
+  }
 
   if (updatedPassword) {
     user.password = updatedPassword;
