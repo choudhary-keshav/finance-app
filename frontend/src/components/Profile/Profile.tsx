@@ -71,32 +71,27 @@ const Profile = () => {
   };
   return (
     <div className="container">
+      <h1>UserProfile</h1>
       <div className="profileWrapper">
+        <h3>Profile Image</h3>
         <div className="imageContainer">
           <img src={user?.data?.pic} alt="" />
         </div>
+        <h3>Profile Details</h3>
         <label htmlFor="email">Name:</label>
-        {isEditing ? (
-          <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
-        ) : (
-          <span>{originalName}</span>
-        )}
-        <br />
+        <input type="text" value={editName} disabled={!isEditing} onChange={(e) => setEditName(e.target.value)} />
         <label htmlFor="email">Email:</label>
-        {isEditing ? (
-          <input type="text" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
-        ) : (
-          <span>{originalEmail}</span>
-        )}
-        <br />
-        <button type="button" className="btn btn-primary" onClick={(e) => handleEditButton(e)}>
-          {isEditing ? "Cancel Edit" : "Edit Profile"}
-        </button>
-        {isEditing && (
-          <button type="button" className="btn btn-success" onClick={handleSubmit}>
-            Submit
+        <input type="text" value={editEmail} disabled={!isEditing} onChange={(e) => setEditEmail(e.target.value)} />
+        <div className="buttonDiv">
+          <button type="button" className="btn btn-primary" onClick={(e) => handleEditButton(e)}>
+            {isEditing ? "Cancel Edit" : "Edit Profile"}
           </button>
-        )}
+          {isEditing && (
+            <button type="button" className="btn btn-success" onClick={handleSubmit}>
+              Submit
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -33,6 +33,7 @@ export const AnalyseExpense = () => {
   const [pieCredit, setPieCredit] = useState<PieNivoData[]>([]);
   const [pieDebit, setPieDebit] = useState<PieNivoData[]>([]);
   const [barData, setBarData] = useState<BarNivoData[]>([]);
+  console.log("pieCredit: ", pieCredit);
 
   const checkFetchError = (givenError: FetchBaseQueryError | SerializedError | undefined): void => {
     if (givenError) {
@@ -161,11 +162,11 @@ export const AnalyseExpense = () => {
       <div className="flexDiv piesContainer">
         <div className="pie leftPie">
           <h4>Credit</h4>
-          <MyResponsivePie data={pieCredit} />
+          {pieCredit.length ? <MyResponsivePie data={pieCredit} /> : <h6>No Credit Data</h6>}
         </div>
         <div className="pie">
           <h4>Debit </h4>
-          <MyResponsivePie data={pieDebit} />
+          {pieDebit.length ? <MyResponsivePie data={pieDebit} /> : <h6>No Debit Data</h6>}
         </div>
       </div>
       <div className="flexDiv bottomCategories">
