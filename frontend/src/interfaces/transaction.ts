@@ -10,7 +10,6 @@ export interface PieNivoData {
   id: string;
   label: string;
   value: number;
-  color: string;
 }
 
 export interface BarData {

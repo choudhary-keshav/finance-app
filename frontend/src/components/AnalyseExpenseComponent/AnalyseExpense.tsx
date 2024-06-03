@@ -33,7 +33,15 @@ export const AnalyseExpense = () => {
   const [pieCredit, setPieCredit] = useState<PieNivoData[]>([]);
   const [pieDebit, setPieDebit] = useState<PieNivoData[]>([]);
   const [barData, setBarData] = useState<BarNivoData[]>([]);
-  console.log("pieCredit: ", pieCredit);
+  const barQuery: BarQuery = { group: "bar" };
+  type !== "All" && (barQuery.isDebit = type === "debit" ? true : false);
+  period !== "All" && (barQuery.period = period);
+  const creditPieQuery: PieQuery = { ...barQuery, group: "pie", isDebit: false };
+  const debitPieQuery = { ...creditPieQuery, isDebit: true };
+  category !== "All" && (barQuery.category = category);
+  const [pieApiTrigger] = usePieApi();
+  const [barApiTrigger] = useBarApi();
+  const stateDependencies = [category, type, period];
 
   const checkFetchError = (givenError: FetchBaseQueryError | SerializedError | undefined): void => {
     if (givenError) {
@@ -59,7 +67,6 @@ export const AnalyseExpense = () => {
         id: transaction._id,
         label: transaction._id,
         value: type === "credit" ? transaction.credit : transaction.debit,
-        color: getColor(transaction._id),
       }));
       setData(creditTransactions);
     } else {
@@ -86,7 +93,6 @@ export const AnalyseExpense = () => {
         };
       });
       const convertToTimestamp = (date: string): number[] => {
-        // Check if the date is in "YYYY/M" format
         const dateDetails = date.split("/");
         const dateInNumbers = dateDetails.map((dateDetail) => Number(dateDetail));
         return dateInNumbers;
@@ -105,16 +111,6 @@ export const AnalyseExpense = () => {
     }
   };
 
-  const barQuery: BarQuery = { group: "bar" };
-  type !== "All" && (barQuery.isDebit = type === "debit" ? true : false);
-  period !== "All" && (barQuery.period = period);
-
-  const creditPieQuery: PieQuery = { ...barQuery, group: "pie", isDebit: false };
-  const debitPieQuery = { ...creditPieQuery, isDebit: true };
-  category !== "All" && (barQuery.category = category);
-  const [pieApiTrigger] = usePieApi();
-  const [barApiTrigger] = useBarApi();
-  const stateDependencies = [category, type, period];
   useEffect(() => {
     pieApiTrigger(creditPieQuery).then((response: any) => {
       if (response.data) {
@@ -128,22 +124,10 @@ export const AnalyseExpense = () => {
     });
     barApiTrigger(barQuery).then((response: any) => {
       if (response.data) {
-        console.log(response.data.transactions);
         setNewBarData(response.data.transactions);
       }
     });
   }, stateDependencies);
-
-  const getColor = (category: string) => {
-    switch (category) {
-      case "food":
-        return "yellow";
-      case "travel":
-        return "skyblue";
-      default:
-        return "orange";
-    }
-  };
 
   return (
     <div>
