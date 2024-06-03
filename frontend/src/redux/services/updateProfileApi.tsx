@@ -19,15 +19,13 @@ export const updateUserApi = createApi({
     viewTransaction: builder.query<
       UpdatedUser,
       {
-        updatedName: string;
-        updatedEmail: string;
+        updatedName?: string;
         updatedPassword?: string;
       }
     >({
-      query: ({ updatedName, updatedEmail, updatedPassword }) => {
+      query: ({ updatedName, updatedPassword }) => {
         const params = new URLSearchParams();
         if (updatedName) params.append("updatedName", updatedName);
-        if (updatedEmail) params.append("updatedEmail", updatedEmail);
         if (updatedPassword) params.append("updatedPassword", updatedPassword);
         return {
           url: `/update?${params.toString()}`,
