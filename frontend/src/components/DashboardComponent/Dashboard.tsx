@@ -38,7 +38,6 @@ const Dashboard: React.FC = () => {
         const initialQueryParams = { page: 1, limit: 10 };
         const initialResponse = await trigger(initialQueryParams);
         const initialData: any = initialResponse.data;
-        console.log(initialData)
         const pages = initialData.totalPages;
         setTotalPages(pages);
 
@@ -70,10 +69,10 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard-main-container">
-      <Heading color="green.500" style={{fontSize:40, display:'flex'}}>
+      <Heading color="green.500" style={{ fontSize: 40, display: "flex" }}>
         Welcome, {user?.data?.name}
       </Heading>
-      <div style={{display:'flex'}}>
+      <div style={{ display: "flex" }}>
         <div style={{ marginLeft: "40px" }} className="dashboard-sub-container">
           <Box
             marginLeft={30}
@@ -91,7 +90,7 @@ const Dashboard: React.FC = () => {
             <Text fontSize="2xl" fontWeight="bold" mt="0" mb="3">
               Total Balance
             </Text>
-            <Text color="green.500" style={{fontSize:43}}>
+            <Text color="green.500" style={{ fontSize: 43 }}>
               {totalBalance.toFixed(2)}
             </Text>
           </Box>
@@ -112,7 +111,7 @@ const Dashboard: React.FC = () => {
             <Text fontSize="2xl" fontWeight="bold" mt="0" mb="3">
               Total Expenses
             </Text>
-            <Text color="red.500"  style={{fontSize:43}}>
+            <Text color="red.500" style={{ fontSize: 43 }}>
               {totalExpenses.toFixed(2)}
             </Text>
           </Box>

@@ -47,7 +47,6 @@ export interface generateTokenPayload {
   pic: string;
 }
 
-// interfaces/interface.ts
 export interface TransactionDetails {
   transactionDate: string;
   description: string;
@@ -59,27 +58,18 @@ export interface TransactionDetails {
 }
 
 // export interface Transaction {
-  
+//   balance: number;
+//   category: string;
+
+//   description: string;
+//   debit: number;
+//   credit: number;
+//   transactionDate: string;
 //   _id: string;
 //   userId: string;
 //   transactions: TransactionDetails;
 //   __v: number;
 // }
-
-
-export interface Transaction {
-  balance: number;
-  category: string;
-
-  description: string;
-  debit: number;
-  credit: number;
-  transactionDate: string;
-  _id: string;
-  userId: string;
-  transactions: TransactionDetails;
-  __v: number;
-}
 
 export interface UpdatedUser {
   _id: string;
@@ -87,4 +77,18 @@ export interface UpdatedUser {
   email: string;
   pic: string;
   token: string;
+}
+export interface TransactionFormData {
+  transactionDate: string;
+  description: string;
+  amount: string;
+  type: string;
+  balance: string;
+  category: string;
+}
+export interface Transaction {
+  _id: string;
+  userId: string;
+  transactions: TransactionDetails;
+  __v: number;
 }
