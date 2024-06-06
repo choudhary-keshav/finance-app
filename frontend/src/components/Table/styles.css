@@ -1,0 +1,46 @@
+table {
+  width: 70%;
+  border-collapse: collapse;
+  margin: auto;
+}
+
+th,
+td {
+  padding: 10px;
+  font-family: "poppins";
+  text-align: center;
+  border-bottom: 2px solid black;
+}
+
+th {
+  background-color: teal;
+  color: white;
+  position: sticky;
+}
+th:nth-child(1) {
+  border-radius: 10px 0px 0px 0px;
+}
+th:nth-last-child(1) {
+  border-radius: 0px 10px 0px 0px;
+}
+
+tr:nth-of-type(even) {
+  background-color: lavender;
+}
+
+#tableWrapper {
+  overflow-x: auto;
+}
+
+.tableNavigator {
+  display: flex;
+  justify-content: center;
+  margin: 10px;
+  overflow-x: auto;
+}
+
+.currentPage {
+  background-color: deepskyblue;
+  color: white;
+  border: none;
+}
