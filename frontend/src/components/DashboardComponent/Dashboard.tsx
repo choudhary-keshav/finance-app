@@ -4,23 +4,7 @@ import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactio
 import "./Dashboard.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-
-export interface TransactionDetails {
-  transactionDate: string;
-  description: string;
-  debit: string;
-  credit: string;
-  balance: string;
-  category: string;
-  _id: string;
-}
-
-export interface Transaction {
-  _id: string;
-  userId: string;
-  transactions: TransactionDetails;
-  __v: number;
-}
+import { Transaction } from "../../interfaces/interface";
 
 const Dashboard: React.FC = () => {
   const [totalExpenses, setTotalExpenses] = useState<number>(0);
@@ -47,7 +31,6 @@ const Dashboard: React.FC = () => {
           const data: any = response.data;
           const transactions: Transaction[] = data.transactions;
 
-          // eslint-disable-next-line no-loop-func, array-callback-return
           transactions.map((transaction) => {
             const { debit, balance } = transaction.transactions;
             if (debit) {

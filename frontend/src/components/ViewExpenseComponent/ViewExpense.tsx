@@ -11,6 +11,7 @@ import "./ViewExpense.styled.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import TransactionModal from "../../pages/modals/TransactionModal";
 import TransactionDeleteModal from "../../pages/modals/TransactionDeleteModal";
+import { toast } from "react-toastify";
 
 export const ViewExpense = () => {
   const [deleteTransactionApi] = useDeleteTransactionApiMutation();
@@ -150,15 +151,15 @@ export const ViewExpense = () => {
       transactionFormData.transactionDate = DateTime.fromISO(
         transactionFormData.transactionDate
       ).toFormat("dd-MM-yyyy");
-
       const response = await editTransactionApi({
         userId,
         transactionId,
         transactionFormData,
       }).unwrap();
 
-      const updatedTransaction = response.transactions[0];
-
+      const updatedTransaction = response.transactions.find(
+        (transaction: Transaction) => transaction._id === transactionId
+      );
       setTransactions((prevTransactions) => {
         const newTransactions = prevTransactions.map((eachTransaction) => {
           if (eachTransaction.transactions._id === transactionId) {
@@ -206,12 +207,6 @@ export const ViewExpense = () => {
         userId,
         transactionId,
       }).unwrap();
-
-      console.log(
-        "Transaction with ID",
-        transactionId,
-        "deleted successfully."
-      );
 
       setTransactions((prevTransactions) =>
         prevTransactions.filter(
