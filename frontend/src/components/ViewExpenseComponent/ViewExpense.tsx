@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { DateTime } from "luxon";
-import { Stack, Select, Radio, RadioGroup, Button } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
+import { Select } from "@chakra-ui/react";
 import { useDeleteTransactionApiMutation } from "../../redux/services/deleteTransactionApi";
 import { useEditTransactionApiMutation } from "../../redux/services/editTransactionApi";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
 import { Transaction } from "../../interfaces/interface";
+import { Radio, RadioGroup, Button } from "@chakra-ui/react";
 import "./ViewExpense.styled.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import TransactionModal from "../../pages/modals/TransactionModal";
 import TransactionDeleteModal from "../../pages/modals/TransactionDeleteModal";
-import { toast } from "react-toastify";
 
 export const ViewExpense = () => {
   const [deleteTransactionApi] = useDeleteTransactionApiMutation();
@@ -88,7 +89,13 @@ export const ViewExpense = () => {
   };
 
   const handleTransactionTypeChange = (value: string) => {
-    setSelectedTransactionType(value === "debit" ? true : value === "credit" ? false : undefined);
+    if (value === "debit") {
+      setSelectedTransactionType(true);
+    } else if (value === "credit") {
+      setSelectedTransactionType(false);
+    } else {
+      setSelectedTransactionType(undefined);
+    }
     setCurrentPage(1);
   };
 
@@ -114,26 +121,35 @@ export const ViewExpense = () => {
   };
 
   const handleTransactionFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    console.log(transactionFormData)
     setTransactionFormData({
       ...transactionFormData,
       [e.target.name]: e.target.value,
     });
+    setTimeout(()=>{
+      console.log(transactionFormData)
+    },500) 
   };
 
   const handleTransactionFormSubmit = async () => {
     try {
-      transactionFormData.transactionDate = DateTime.fromISO(
-        transactionFormData.transactionDate
-      ).toFormat("dd-MM-yyyy");
+      transactionFormData.transactionDate = DateTime.fromISO(transactionFormData.transactionDate).toFormat(
+        "dd-MM-yyyy"
+      );
+
       const response = await editTransactionApi({
         userId,
         transactionId,
         transactionFormData,
       }).unwrap();
 
+      console.log(response)
+
+      
       const updatedTransaction = response.transactions.find(
         (transaction: Transaction) => transaction._id === transactionId
       );
+
       setTransactions((prevTransactions) => {
         const newTransactions = prevTransactions.map((eachTransaction) => {
           if (eachTransaction.transactions._id === transactionId) {
@@ -154,6 +170,7 @@ export const ViewExpense = () => {
         });
         return newTransactions;
       });
+
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error updating transaction:", error);
@@ -163,8 +180,10 @@ export const ViewExpense = () => {
   const handleDeleteButton = (transaction: Transaction, transaction_id: string) => {
     const userId = transaction._id;
     const transactionId = transaction.transactions._id;
+
     setUserId(userId);
     setTransactionId(transactionId);
+
     setIsDeleteModalOpen(true);
   };
 
@@ -224,8 +243,8 @@ export const ViewExpense = () => {
             <tr>
               <th style={{ borderTopLeftRadius: 10 }}>Transaction Date</th>
               <th>Description</th>
-              {selectedTransactionType === true && <th>Debit</th>}
-              {selectedTransactionType === false && <th>Credit</th>}
+              {selectedTransactionType !== false && <th>Debit</th>}
+              {selectedTransactionType !== true && <th>Credit</th>}
               <th>Balance</th>
               <th>Category</th>
               <th style={{ borderTopRightRadius: 10 }}>Action</th>
@@ -242,8 +261,8 @@ export const ViewExpense = () => {
                   <tr key={_id}>
                     <td className={isDebit}>{transactionDate}</td>
                     <td className={isDebit}>{description}</td>
-                    {selectedTransactionType === true && <td className={isDebit}>{debit}</td>}
-                    {selectedTransactionType === false && <td className={isDebit}>{credit}</td>}
+                    {selectedTransactionType !== false && <td className={isDebit}>{debit}</td>}
+                    {selectedTransactionType !== true && <td className={isDebit}>{credit}</td>}
                     <td className={isDebit}>{balance}</td>
                     <td className={isDebit}>{category}</td>
                     <td className={isDebit}>
@@ -271,6 +290,9 @@ export const ViewExpense = () => {
           ))}
           <Button onClick={() => handlePageChange(currentPage + 1)} isDisabled={currentPage === totalPages}>
             {">"}
+
+
+            
           </Button>
         </div>
       </div>

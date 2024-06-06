@@ -29,13 +29,14 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   isEditing,
 }) => {
   const [balance, setBalance] = useState<any>(totalBalance);
-
   useEffect(() => {
     setBalance(totalBalance);
   }, [totalBalance]);
 
   useEffect(() => {
-    transactionFormData.balance = String(balance);
+    if(!isEditing){
+      transactionFormData.balance = String(balance);
+    }
   }, [balance, transactionFormData]);
 
   const handleTypeChange = (value: string) => {
@@ -93,6 +94,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               value={transactionFormData.amount}
               onChange={handleTransactionFormChange}
               placeholder="Amount"
+              readOnly={isEditing}
             />
           </FormControl>
           <FormControl>
@@ -103,8 +105,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               onChange={(e) => handleTypeChange(e as unknown as string)}
             >
               <Stack direction="row">
-                <Radio value="debit">Debit</Radio>
-                <Radio value="credit">Credit</Radio>
+                <Radio value="debit" isDisabled={isEditing}>Debit</Radio>
+                <Radio value="credit" isDisabled={isEditing}>Credit</Radio>
               </Stack>
             </RadioGroup>
           </FormControl>
@@ -113,9 +115,10 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             <Input
               type="text"
               name="balance"
-              value={balance}
+              value={isEditing ? transactionFormData.balance : balance}
               onChange={handleTransactionFormChange}
               placeholder="Balance"
+              readOnly={isEditing}
             />
           </FormControl>
           <FormControl>
