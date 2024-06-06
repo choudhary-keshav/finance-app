@@ -9,7 +9,6 @@ const saveExcelData = async (req: Request, res: Response) => {
     let existingTransaction = await TransactionModel.findOne({ userId });
 
     if (existingTransaction) {
-      // Append new transactions to existing ones
       const newTransactions = excelData.map((row: any, index: any) => ({
         transactionDate: row[0],
         description: row[1],
@@ -23,7 +22,6 @@ const saveExcelData = async (req: Request, res: Response) => {
 
       await existingTransaction.save();
     } else {
-      // Create new transaction document
       const newTransaction = new TransactionModel({
         userId,
         transactions: excelData.map((row: any, index: any) => ({
@@ -43,7 +41,6 @@ const saveExcelData = async (req: Request, res: Response) => {
         $push: { transactions: transactionId },
       });
     }
-
     res.status(201).json({ message: 'Transactions saved successfully' });
   } catch (error) {
     console.error('Error saving transactions:', error);

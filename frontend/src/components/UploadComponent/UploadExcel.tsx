@@ -20,27 +20,23 @@ import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactio
 import { useSaveExcelDataMutation } from "../../redux/services/saveExcelApi";
 
 const UploadExcel: React.FC = () => {
-  const [excelData, setExcelData] = useState<(string | null | undefined)[][]>(
-    []
-  );
+  const [excelData, setExcelData] = useState<(string | null | undefined)[][]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isFileUploaded, setIsFileUploaded] = useState<boolean>(false);
   const [totalBalance, setTotalBalance] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [transactionFormData, setTransactionFormData] =
-    useState<TransactionFormData>({
-      transactionDate: "",
-      description: "",
-      amount: "",
-      type: "",
-      balance: "",
-      category: "",
-    });
+  const [transactionFormData, setTransactionFormData] = useState<TransactionFormData>({
+    transactionDate: "",
+    description: "",
+    amount: "",
+    type: "",
+    balance: "",
+    category: "",
+  });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [trigger] = useLazyViewTransactionQuery();
-  const [saveExcelData, { isLoading, isError, error }] =
-    useSaveExcelDataMutation();
+  const [saveExcelData] = useSaveExcelDataMutation();
 
   useEffect(() => {
     const fetchAllPages = async () => {
@@ -83,7 +79,7 @@ const UploadExcel: React.FC = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
-      console.log("khli h");
+      toast.error("Please choose the file")
       return;
     }
 
@@ -93,12 +89,8 @@ const UploadExcel: React.FC = () => {
     ];
     const validExtensions = [".xls", ".xlsx"];
 
-    const fileExtension = file.name
-      .slice(file.name.lastIndexOf("."))
-      .toLowerCase();
-    const isValidFile =
-      validMimeTypes.includes(file.type) &&
-      validExtensions.includes(fileExtension);
+    const fileExtension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+    const isValidFile = validMimeTypes.includes(file.type) && validExtensions.includes(fileExtension);
 
     if (!isValidFile) {
       toast.error("Please upload a valid Excel file ('.xls' or '.xlsx').");
@@ -112,20 +104,15 @@ const UploadExcel: React.FC = () => {
       const workbook = XLSX.read(data, { type: "array" });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
-      const jsonData: (string | null | undefined)[][] =
-        XLSX.utils.sheet_to_json(sheet, {
-          header: 1,
-          defval: null,
-        });
+      const jsonData: (string | null | undefined)[][] = XLSX.utils.sheet_to_json(sheet, {
+        header: 1,
+        defval: null,
+      });
 
       const filteredData = jsonData
-        .filter((row: (string | null | undefined)[]) =>
-          row.some((cell) => cell !== null && cell !== undefined)
-        )
+        .filter((row: (string | null | undefined)[]) => row.some((cell) => cell !== null && cell !== undefined))
         .map((row: (string | null | undefined)[]) =>
-          row.map((cell, index) =>
-            index === 0 ? serialNumberToDate(Number(cell || 0)) : cell || ""
-          )
+          row.map((cell, index) => (index === 0 ? serialNumberToDate(Number(cell || 0)) : cell || ""))
         );
       if (filteredData.length <= 1) {
         toast.error("The uploaded file is empty or contains no valid data.");
@@ -133,9 +120,7 @@ const UploadExcel: React.FC = () => {
         return;
       }
       setExcelData(filteredData.slice(1));
-      setSelectedCategories(
-        filteredData.slice(1).map((row) => (row[5] ? (row[5] as string) : ""))
-      );
+      setSelectedCategories(filteredData.slice(1).map((row) => (row[5] ? (row[5] as string) : "")));
     };
     setIsFileUploaded(true);
     reader.readAsArrayBuffer(file);
@@ -147,9 +132,7 @@ const UploadExcel: React.FC = () => {
     setSelectedCategories(updatedCategories);
   };
 
-  const handleTransactionFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleTransactionFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setTransactionFormData((prevState) => ({
       ...prevState,
@@ -158,17 +141,12 @@ const UploadExcel: React.FC = () => {
   };
 
   const handleTransactionFormSubmit = async () => {
-    if (
-      !transactionFormData.transactionDate ||
-      !transactionFormData.description
-    ) {
-      console.log("Enter transaction date and description");
+    if (!transactionFormData.transactionDate || !transactionFormData.description) {
+      toast.error("Enter transaction date and description");
       return;
     }
 
-    const formattedDate = DateTime.fromISO(
-      transactionFormData.transactionDate
-    ).toFormat("dd-MM-yyyy");
+    const formattedDate = DateTime.fromISO(transactionFormData.transactionDate).toFormat("dd-MM-yyyy");
 
     const updatedExcelData = [
       ...excelData,
@@ -219,8 +197,9 @@ const UploadExcel: React.FC = () => {
         selectedCategories,
         userId,
       }).unwrap();
+      console.log(response, "response");
       toast.success("Transaction added successfully");
-      console.log("Data saved:", response.data);
+      console.log("Data saved:", response);
     } catch (error) {
       toast.error("Error saving data");
       console.error("Error saving data:", error);
@@ -259,7 +238,7 @@ const UploadExcel: React.FC = () => {
         userId,
       }).unwrap();
       toast.success("Data saved successfully");
-      console.log("Data saved:", response.data);
+      console.log("Data saved:", response);
       setExcelData([]);
     } catch (error) {
       toast.error("Error saving data");
@@ -267,9 +246,7 @@ const UploadExcel: React.FC = () => {
     }
   };
 
-  const handleCategoryNewTransaction = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleCategoryNewTransaction = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     handleTransactionFormChange(e);
     console.log(e.target.value);
     handleCategoryChange(excelData.length, e.target.value);
@@ -294,14 +271,7 @@ const UploadExcel: React.FC = () => {
         >
           Save Data
         </Button>
-        <Button
-          size="lg"
-          colorScheme="teal"
-          onClick={onOpen}
-          margin="7"
-          padding="22px"
-          width="35%"
-        >
+        <Button size="lg" colorScheme="teal" onClick={onOpen} margin="7" padding="22px" width="35%">
           Add a single transaction
         </Button>
       </div>
@@ -332,9 +302,7 @@ const UploadExcel: React.FC = () => {
                       ) : (
                         <Select
                           value={selectedCategories[rowIndex] || ""}
-                          onChange={(e) =>
-                            handleCategoryChange(rowIndex, e.target.value)
-                          }
+                          onChange={(e) => handleCategoryChange(rowIndex, e.target.value)}
                           placeholder="Select category"
                         >
                           <option value="Food">Food</option>
