@@ -13,7 +13,7 @@ export const getTransactions = async (req: Request, res: Response) => {
     page,
     limit,
   } = req.query;
-  console.log(req.query);
+ 
   const user = req.body.user.payload;
   const userId: string = user._id;
 
@@ -83,7 +83,6 @@ export const getTransactions = async (req: Request, res: Response) => {
         break;
       default:
         startDate = undefined;
-        console.log('default case is running');
         break;
     }
     let matchDate: any = {

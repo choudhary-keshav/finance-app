@@ -15,7 +15,6 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.96",
     "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.25",
     "axios": "^1.7.2",
@@ -61,6 +60,7 @@
   },
   "devDependencies": {
     "@types/luxon": "^3.4.2",
+    "@types/node": "^20.14.2",
     "@types/react-table": "^7.7.20",
     "@types/redux-persist": "^4.3.1"
   }

@@ -61,13 +61,14 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     } as React.ChangeEvent<HTMLInputElement>);
 
     if (Number(transactionFormData.amount)) {
-      let temp;
+      let newBalance;
+      const initialBalance = totalBalance ?? 0; 
       if (value === "credit") {
-        temp = Number(balance) + Number(transactionFormData.amount);
+        newBalance = initialBalance + Number(transactionFormData.amount);
       } else if (value === "debit") {
-        temp = Number(balance) - Number(transactionFormData.amount);
+        newBalance = initialBalance - Number(transactionFormData.amount);
       }
-      setBalance(temp);
+      setBalance(newBalance);
     }
   };
 
