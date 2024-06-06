@@ -4,16 +4,17 @@ import { Table, Thead, Tbody, Tr, Th, Td, Box } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { DateTime } from "luxon";
-import { Select, Button, Input, FormControl, FormLabel, useDisclosure } from "@chakra-ui/react";
 import {
-  // TransactionDetails,
-  TransactionFormData,
-  Transaction,
-} from "../../interfaces/interface";
-// import axios from "axios";
+  Select,
+  Button,
+  Input,
+  FormControl,
+  FormLabel,
+  useDisclosure,
+} from "@chakra-ui/react";
+import { TransactionFormData, Transaction } from "../../interfaces/interface";
 import { jwtDecode } from "jwt-decode";
 import TransactionModal from "../../pages/modals/TransactionModal";
-// import { isDisabled, isEditable } from "@testing-library/user-event/dist/utils";
 import "./UploadExcel.styled.css";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
 import { useSaveExcelDataMutation } from "../../redux/services/saveExcelApi";

@@ -1,60 +1,36 @@
-// import { configureStore, combineReducers } from "@reduxjs/toolkit";
-// import authenticationReducer from "./features/authenticationSlice";
-// import storage from "redux-persist/lib/storage";
-// import { persistReducer, persistStore } from "redux-persist";
-// import { authApi } from "./services/authApi";
-// import { transactionApi } from "./services/viewTransactionApi";
-// const rootreducer = combineReducers({ authentication: authenticationReducer, [authApi.reducerPath]: authApi.reducer, [transactionApi.reducerPath]:transactionApi.reducer });
-
-// const persistConfig = {
-//   key: "root",
-//   storage,
-//   version: 1,
-//   blacklist: ["authentication"],
-// };
-// const persisireducer = persistReducer(persistConfig, rootreducer);
-// export const store = configureStore({
-//   reducer: persisireducer,
-//   middleware: (getDefaultMiddleware) =>
-//     getDefaultMiddleware({
-//       serializableCheck: {
-//         ignoredActions: ["persist/PERSIST"],
-//       },
-//     }).concat(authApi.middleware, transactionApi.middleware),
-// });
-// export const persistor = persistStore(store);
-// export type RootState = ReturnType<typeof store.getState>;
-// export type AppDispatch = typeof store.dispatch;// ./store.ts
-
-// ./store.ts
-
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import authenticationReducer from "./features/authenticationSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { authApi } from "./services/authApi";
 import { transactionApi } from "./services/viewTransactionApi";
-import saveExcelApi from "./services/saveExcelApi"; // Import saveExcelApi
+import saveExcelApi from "./services/saveExcelApi";
+import { editTransactionApi } from "./services/editTransactionApi";
+import { deleteTransactionApi } from "./services/deleteTransactionApi";
 
-// Root reducer
 const rootReducer = combineReducers({
   authentication: authenticationReducer,
   [authApi.reducerPath]: authApi.reducer,
   [transactionApi.reducerPath]: transactionApi.reducer,
-  [saveExcelApi.reducerPath]: saveExcelApi.reducer, // Add saveExcelApi reducer here
+  [saveExcelApi.reducerPath]: saveExcelApi.reducer,
+  [editTransactionApi.reducerPath]: editTransactionApi.reducer,
+  [deleteTransactionApi.reducerPath]: deleteTransactionApi.reducer,
 });
 
-// Redux Persist configuration
 const persistConfig = {
   key: "root",
   storage,
   version: 1,
-  blacklist: ["authentication", saveExcelApi.reducerPath], // Add saveExcelApi.reducerPath here
+  blacklist: [
+    "authentication",
+    saveExcelApi.reducerPath,
+    editTransactionApi.reducerPath,
+    deleteTransactionApi.reducerPath,
+  ],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// Configure store
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
@@ -65,11 +41,12 @@ export const store = configureStore({
     }).concat(
       authApi.middleware,
       transactionApi.middleware,
-      saveExcelApi.middleware
-    ), // Add saveExcelApi middleware here
+      saveExcelApi.middleware,
+      editTransactionApi.middleware,
+      deleteTransactionApi.middleware
+    ),
 });
 
-// Export persistor and types
 export const persistor = persistStore(store);
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
