@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-undef */
 import React from "react";
 import {
   Modal,
@@ -16,7 +15,11 @@ interface LogoutConfirmationModalProps {
   logoutHandler: () => void;
 }
 
-const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = ({ isOpen, onClose, logoutHandler }) => {
+const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = ({
+  isOpen,
+  onClose,
+  logoutHandler,
+}) => {
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>

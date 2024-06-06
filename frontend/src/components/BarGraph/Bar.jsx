@@ -1,13 +1,5 @@
-// install (please try to align the version of installed @nivo packages)
-// yarn add @nivo/bar
 import { ResponsiveBar } from "@nivo/bar";
 const BAR_VALUE_PADDING = 5;
-
-// make sure parent container have a defined height when using
-// responsive component, otherwise height will be 0 and
-// no chart will be rendered.
-// website examples showcase many properties,
-// you'll often use just a few of them.
 
 const BarLabels = ({ bars }) => {
   return (
@@ -15,7 +7,12 @@ const BarLabels = ({ bars }) => {
       {bars.map(
         ({ width, height, x, y, data: { formattedValue } }) =>
           height > 0 && (
-            <text key={`${x}.${y}`} x={x + width / 2} y={y - BAR_VALUE_PADDING} textAnchor="middle">
+            <text
+              key={`${x}.${y}`}
+              x={x + width / 2}
+              y={y - BAR_VALUE_PADDING}
+              textAnchor="middle"
+            >
               {formattedValue}
             </text>
           )
@@ -24,7 +21,7 @@ const BarLabels = ({ bars }) => {
   );
 };
 
-const MyResponsiveBar = ({ data, indexBy, labelBottom, labelLeft, keys /* see data tab */ }) => (
+const MyResponsiveBar = ({ data, indexBy, labelBottom, labelLeft, keys }) => (
   <ResponsiveBar
     data={data}
     keys={keys}
@@ -50,8 +47,8 @@ const MyResponsiveBar = ({ data, indexBy, labelBottom, labelLeft, keys /* see da
     valueScale={{ type: "linear" }}
     indexScale={{ type: "band", round: true }}
     colors={{ scheme: "accent" }}
-    layers={["grid", "axes", "bars", BarLabels, "legends"]} // unlike @trymbill I just use the original bars and add the bar labels in a separate layer like @mkusold
-    enableLabel={false} // disable labels in the original bars
+    layers={["grid", "axes", "bars", BarLabels, "legends"]}
+    enableLabel={false}
     defs={[
       {
         id: "dots",
@@ -143,7 +140,9 @@ const MyResponsiveBar = ({ data, indexBy, labelBottom, labelLeft, keys /* see da
     ]}
     role="application"
     ariaLabel="Nivo bar chart demo"
-    barAriaLabel={(e) => e.id + ": " + e.formattedValue + " in country: " + e.indexValue}
+    barAriaLabel={(e) =>
+      e.id + ": " + e.formattedValue + " in country: " + e.indexValue
+    }
   />
 );
 

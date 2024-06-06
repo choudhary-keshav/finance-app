@@ -16,24 +16,7 @@ import {
   ModalFooter,
   Button,
 } from "@chakra-ui/react";
-
-interface TransactionModalProps {
-  totalBalance?: number | null;
-  isOpen: boolean;
-  onClose: () => void;
-  transactionFormData: {
-    transactionDate: string;
-    description: string;
-    amount: string;
-    type: string;
-    balance: string;
-    category: string;
-  };
-  handleTransactionFormChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  handleTransactionFormSubmit: () => void;
-  handleCategoryNewTransaction: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  isEditing: boolean;
-}
+import { TransactionModalProps } from "../../interfaces/interface";
 
 const TransactionModal: React.FC<TransactionModalProps> = ({
   totalBalance,
@@ -71,12 +54,14 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       setBalance(newBalance);
     }
   };
-
+  const currentDate = new Date().toISOString().split("T")[0];
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>{isEditing ? "Edit Transaction" : "Add Transaction"}</ModalHeader>
+        <ModalHeader>
+          {isEditing ? "Edit Transaction" : "Add Transaction"}
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <FormControl>
@@ -84,6 +69,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             <Input
               type="date"
               name="transactionDate"
+              max={currentDate}
               value={transactionFormData.transactionDate}
               onChange={handleTransactionFormChange}
               placeholder="Transaction Date"
@@ -147,7 +133,11 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={handleTransactionFormSubmit} colorScheme="blue" mr={3}>
+          <Button
+            onClick={handleTransactionFormSubmit}
+            colorScheme="blue"
+            mr={3}
+          >
             {isEditing ? "Edit Transaction" : "Add Transaction"}
           </Button>
           <Button onClick={onClose}>Cancel</Button>

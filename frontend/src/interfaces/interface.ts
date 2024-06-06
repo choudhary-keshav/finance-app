@@ -78,3 +78,54 @@ export interface Transaction {
   transactions: TransactionDetails;
   __v: number;
 }
+export interface PieQuery {
+  category?: string;
+  period?: string;
+  type?: string;
+  group: "pie";
+  isDebit: boolean;
+}
+
+export interface BarQuery {
+  category?: string;
+  period?: string;
+  isDebit?: boolean;
+  group: "bar";
+}
+export interface TransactionDetails {
+  transactionDate: string;
+  description: string;
+  debit: string;
+  credit: string;
+  balance: string;
+  category: string;
+  _id: string;
+}
+
+export interface Transaction {
+  _id: string;
+  userId: string;
+  transactions: TransactionDetails;
+  __v: number;
+}
+export interface TransactionModalProps {
+  totalBalance?: number | null;
+  isOpen: boolean;
+  onClose: () => void;
+  transactionFormData: {
+    transactionDate: string;
+    description: string;
+    amount: string;
+    type: string;
+    balance: string;
+    category: string;
+  };
+  handleTransactionFormChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
+  handleTransactionFormSubmit: () => void;
+  handleCategoryNewTransaction: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
+  isEditing: boolean;
+}

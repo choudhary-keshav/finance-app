@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, CloseButton, Flex, useColorModeValue, Text, Image } from "@chakra-ui/react";
+import {
+  Box,
+  CloseButton,
+  Flex,
+  useColorModeValue,
+  Text,
+  Image,
+} from "@chakra-ui/react";
 import { FiTrendingUp, FiCompass, FiStar, FiSettings } from "react-icons/fi";
 import { LinkItemProps } from "../../interfaces/interface";
 import NavItem from "./NavItem";
@@ -22,12 +29,28 @@ const SidebarContent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       w={{ base: "full", md: 60 }}
       pos="fixed"
       h="full"
-      // marginTop={5}
       backgroundColor="#e2e2e2b0"
     >
-      <Flex marginTop={5} marginBottom={12} h="20" alignItems="center" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" margin="auto">
-          <Image borderRadius="cover" boxSize="90px" src={logoImg} alt="logo" align="center" />
+      <Flex
+        marginTop={5}
+        marginBottom={12}
+        h="20"
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        <Text
+          fontSize="2xl"
+          fontFamily="monospace"
+          fontWeight="bold"
+          margin="auto"
+        >
+          <Image
+            borderRadius="cover"
+            boxSize="90px"
+            src={logoImg}
+            alt="logo"
+            align="center"
+          />
         </Text>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
