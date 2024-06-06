@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { DateTime } from "luxon";
-import { Stack } from "@chakra-ui/react";
-import { Select } from "@chakra-ui/react";
+import { Stack, Select, Radio, RadioGroup, Button } from "@chakra-ui/react";
 import { useDeleteTransactionApiMutation } from "../../redux/services/deleteTransactionApi";
 import { useEditTransactionApiMutation } from "../../redux/services/editTransactionApi";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
 import { Transaction } from "../../interfaces/interface";
-import { Radio, RadioGroup, Button } from "@chakra-ui/react";
 import "./ViewExpense.styled.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import TransactionModal from "../../pages/modals/TransactionModal";
@@ -89,13 +87,7 @@ export const ViewExpense = () => {
   };
 
   const handleTransactionTypeChange = (value: string) => {
-    if (value === "debit") {
-      setSelectedTransactionType(true);
-    } else if (value === "credit") {
-      setSelectedTransactionType(false);
-    } else {
-      setSelectedTransactionType(undefined);
-    }
+    setSelectedTransactionType(value === "debit" ? true : value === "credit" ? false : undefined);
     setCurrentPage(1);
   };
 
@@ -121,7 +113,6 @@ export const ViewExpense = () => {
   };
 
   const handleTransactionFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    console.log(transactionFormData)
     setTransactionFormData({
       ...transactionFormData,
       [e.target.name]: e.target.value,
@@ -170,7 +161,6 @@ export const ViewExpense = () => {
         });
         return newTransactions;
       });
-
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error updating transaction:", error);
@@ -180,10 +170,8 @@ export const ViewExpense = () => {
   const handleDeleteButton = (transaction: Transaction, transaction_id: string) => {
     const userId = transaction._id;
     const transactionId = transaction.transactions._id;
-
     setUserId(userId);
     setTransactionId(transactionId);
-
     setIsDeleteModalOpen(true);
   };
 
