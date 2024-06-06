@@ -1,0 +1,57 @@
+.expense-table {
+  width: 100%;
+}
+
+.expense-table th {
+  font-weight: 400;
+  background-color: #39532f;
+  height: 60px;
+  font-size: 0.9vw;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.expense-table td {
+  padding: 15px;
+  text-align: center;
+  width: 20px;
+  border-bottom: 0.5px solid rgb(203, 203, 203);
+}
+
+.expense-table .credit {
+  background-color: #e3ebedb0;
+  color: black;
+  font-weight: 500;
+}
+
+.expense-table .debit {
+  font-weight: 500;
+  color: black;
+}
+
+.viewExpense-main-container {
+  width: 100%;
+  border-radius: 10;
+  padding: 10;
+}
+.viewExpense-sub-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin: 18px;
+  margin-left: auto;
+}
+
+.viewExpense-table-container {
+  width: 100%;
+  padding: 15;
+}
+.pagination-controls{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+}

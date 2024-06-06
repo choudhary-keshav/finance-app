@@ -46,3 +46,35 @@ export interface generateTokenPayload {
   email: string;
   pic: string;
 }
+
+export interface TransactionDetails {
+  transactionDate: string;
+  description: string;
+  debit: string;
+  credit: string;
+  balance: string;
+  category: string;
+  _id: string;
+}
+
+export interface UpdatedUser {
+  _id: string;
+  name: string;
+  email: string;
+  pic: string;
+  token: string;
+}
+export interface TransactionFormData {
+  transactionDate: string;
+  description: string;
+  amount: string;
+  type: string;
+  balance: string;
+  category: string;
+}
+export interface Transaction {
+  _id: string;
+  userId: string;
+  transactions: TransactionDetails;
+  __v: number;
+}

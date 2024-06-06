@@ -9,19 +9,21 @@ const saveExcelData = async (req: Request, res: Response) => {
     let existingTransaction = await TransactionModel.findOne({ userId });
 
     if (existingTransaction) {
-      existingTransaction.transactions = excelData.map(
-        (row: any, index: any) => ({
-          transactionDate: row[0],
-          description: row[1],
-          debit: row[2],
-          credit: row[3],
-          balance: row[4],
-          category: selectedCategories[index],
-        }),
-      );
+      // Append new transactions to existing ones
+      const newTransactions = excelData.map((row: any, index: any) => ({
+        transactionDate: row[0],
+        description: row[1],
+        debit: row[2],
+        credit: row[3],
+        balance: row[4],
+        category: selectedCategories[index],
+      }));
+
+      existingTransaction.transactions.push(...newTransactions);
 
       await existingTransaction.save();
     } else {
+      // Create new transaction document
       const newTransaction = new TransactionModel({
         userId,
         transactions: excelData.map((row: any, index: any) => ({

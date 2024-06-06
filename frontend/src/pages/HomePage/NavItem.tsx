@@ -17,6 +17,7 @@ const NavItem: React.FC<NavItemProps> = ({ icon, children, to }) => {
           bg: "cyan.400",
           color: "white",
         }}
+        marginTop={5}
       >
         {icon && (
           <Icon

@@ -7,6 +7,7 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const app = express();
 const PORT = process.env.PORT ?? 5000;
 const excelRoutes = require('./routes/excelRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
 const morgan = require('morgan');
 
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api', excelRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api', transactionRoutes);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello, world!');

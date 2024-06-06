@@ -41,7 +41,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  console.log({email});
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -63,4 +62,41 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-module.exports = { registerUser, loginUser };
+const updateUser = asyncHandler(async (req: Request, res: Response) => {
+  const { updatedName, updatedPassword } = req.query;
+  const { email } = req.body.user.payload;
+
+  if (!updatedName && !updatedPassword) {
+    res.send('No name or password given');
+    return;
+  }
+
+  const user = await User.findOne({ email });
+  console.log(user);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User Not Found');
+  }
+
+  if (updatedName) {
+    user.name = updatedName;
+  }
+
+  if (updatedPassword) {
+    user.password = updatedPassword;
+  }
+
+  const updatedUser = await user.save();
+
+  res.json({
+    _id: updatedUser._id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    isAdmin: updatedUser.isAdmin,
+    pic: updatedUser.pic,
+    token: generateToken(updatedUser),
+  });
+});
+
+module.exports = { registerUser, loginUser, updateUser };

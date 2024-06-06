@@ -1,0 +1,52 @@
+.pie {
+  width: 450px;
+  height: 350px;
+  text-align: center;
+  margin: 30px;
+}
+
+.flexDiv {
+  display: flex;
+}
+
+.bar {
+  height: 400px;
+  padding-left: 20px;
+}
+
+select {
+  border: 2px solid grey;
+  margin: 10px;
+  border-radius: 5px;
+}
+
+.barWrapper {
+  overflow-x: auto;
+}
+
+.chakraSelect {
+  width: 200px;
+  margin-right: 20px;
+}
+
+.bottomCategories {
+  margin-top: 30px;
+}
+
+.piesContainer {
+  border-radius: 20px;
+  background-color: rgb(241, 240, 240);
+  border: 2px solid rgb(187, 187, 187);
+  width: fit-content;
+}
+
+.leftPie {
+  border-right: 2px dashed rgb(187, 187, 187);
+  padding-right: 30px;
+  width: 510px;
+  margin-left: 0px;
+}
+
+h6 {
+  margin-top: 150px;
+}

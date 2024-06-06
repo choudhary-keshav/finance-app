@@ -6,7 +6,7 @@ import MobileNav from "./MobileNav";
 
 const SidebarWithHeader: React.FC<SidebarWithHeaderProps> = ({ onClose, isOpen, onOpen }) => {
   return (
-    <>
+    <div style={{}}>
       <SidebarContent onClose={onClose} />
       <Drawer
         autoFocus={false}
@@ -22,7 +22,7 @@ const SidebarWithHeader: React.FC<SidebarWithHeaderProps> = ({ onClose, isOpen, 
         </DrawerContent>
       </Drawer>
       <MobileNav onOpen={onOpen} />
-    </>
+    </div>
   );
 };
 export default SidebarWithHeader;
