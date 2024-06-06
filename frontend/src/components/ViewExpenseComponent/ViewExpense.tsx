@@ -17,9 +17,7 @@ export const ViewExpense = () => {
   const [editTransactionApi] = useEditTransactionApiMutation();
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedTransactionType, setSelectedTransactionType] = useState<
-    boolean | undefined
-  >(undefined);
+  const [selectedTransactionType, setSelectedTransactionType] = useState<boolean | undefined>(undefined);
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -53,10 +51,8 @@ export const ViewExpense = () => {
     period: selectedOption,
     category: selectedCategory,
     isDebit: selectedTransactionType,
-    customPeriodStart:
-      selectedOption === "custom" ? formatDate(fromDate) : undefined,
-    customPeriodEnd:
-      selectedOption === "custom" ? formatDate(toDate) : undefined,
+    customPeriodStart: selectedOption === "custom" ? formatDate(fromDate) : undefined,
+    customPeriodEnd: selectedOption === "custom" ? formatDate(toDate) : undefined,
     page: currentPage,
     limit: 10,
   };
@@ -68,14 +64,7 @@ export const ViewExpense = () => {
         setTransactions(response.data.transactions);
       }
     });
-  }, [
-    selectedOption,
-    selectedCategory,
-    selectedTransactionType,
-    fromDate,
-    toDate,
-    currentPage,
-  ]);
+  }, [selectedOption, selectedCategory, selectedTransactionType, fromDate, toDate, currentPage]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -94,9 +83,7 @@ export const ViewExpense = () => {
     setCurrentPage(1);
   };
 
-  const handleCategoryChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(event.target.value);
     setCurrentPage(1);
   };
@@ -116,10 +103,7 @@ export const ViewExpense = () => {
     setCurrentPage(newPage);
   };
 
-  const handleEditClick = (
-    transaction: Transaction,
-    transaction_id: string
-  ) => {
+  const handleEditClick = (transaction: Transaction, transaction_id: string) => {
     setUserId(transaction._id);
     setTransactionId(transaction_id);
     setTransactionFormData({
@@ -136,9 +120,7 @@ export const ViewExpense = () => {
     setIsEditing(true);
   };
 
-  const handleTransactionFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleTransactionFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setTransactionFormData({
       ...transactionFormData,
       [e.target.name]: e.target.value,
@@ -147,9 +129,9 @@ export const ViewExpense = () => {
 
   const handleTransactionFormSubmit = async () => {
     try {
-      transactionFormData.transactionDate = DateTime.fromISO(
-        transactionFormData.transactionDate
-      ).toFormat("dd-MM-yyyy");
+      transactionFormData.transactionDate = DateTime.fromISO(transactionFormData.transactionDate).toFormat(
+        "dd-MM-yyyy"
+      );
 
       const response = await editTransactionApi({
         userId,
@@ -187,10 +169,7 @@ export const ViewExpense = () => {
     }
   };
 
-  const handleDeleteButton = (
-    transaction: Transaction,
-    transaction_id: string
-  ) => {
+  const handleDeleteButton = (transaction: Transaction, transaction_id: string) => {
     const userId = transaction._id;
     const transactionId = transaction.transactions._id;
 
@@ -207,30 +186,18 @@ export const ViewExpense = () => {
         transactionId,
       }).unwrap();
 
-      console.log(
-        "Transaction with ID",
-        transactionId,
-        "deleted successfully."
-      );
+      console.log("Transaction with ID", transactionId, "deleted successfully.");
 
       setTransactions((prevTransactions) =>
-        prevTransactions.filter(
-          (eachTransaction) =>
-            eachTransaction.transactions._id !== transactionId
-        )
+        prevTransactions.filter((eachTransaction) => eachTransaction.transactions._id !== transactionId)
       );
 
       setIsDeleteModalOpen(false);
     } catch (error) {
-      console.error(
-        `Error deleting transaction with ID ${transactionId}:`,
-        error
-      );
+      console.error(`Error deleting transaction with ID ${transactionId}:`, error);
     }
   };
-  const handleCategoryNewTransaction = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleCategoryNewTransaction = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setTransactionFormData({
       ...transactionFormData,
       category: e.target.value,
@@ -242,12 +209,7 @@ export const ViewExpense = () => {
   return (
     <div className="viewExpense-main-container">
       <div className="viewExpense-sub-container">
-        <Select
-          value={selectedOption}
-          onChange={handleSelectChange}
-          placeholder="All"
-          width="250px"
-        >
+        <Select value={selectedOption} onChange={handleSelectChange} placeholder="All" width="250px">
           <option value="thisWeek">This Week</option>
           <option value="thisMonth">This Month</option>
           <option value="thisYear">This Year</option>
@@ -255,26 +217,11 @@ export const ViewExpense = () => {
         </Select>
         {selectedOption === "custom" && (
           <>
-            <input
-              type="date"
-              placeholder="from"
-              value={fromDate}
-              onChange={handleFromDateChange}
-            />
-            <input
-              type="date"
-              placeholder="to"
-              value={toDate}
-              onChange={handleToDateChange}
-            />
+            <input type="date" placeholder="from" value={fromDate} onChange={handleFromDateChange} />
+            <input type="date" placeholder="to" value={toDate} onChange={handleToDateChange} />
           </>
         )}
-        <Select
-          value={selectedCategory}
-          onChange={handleCategoryChange}
-          placeholder="All"
-          width="250px"
-        >
+        <Select value={selectedCategory} onChange={handleCategoryChange} placeholder="All" width="250px">
           <option value="Food">Food</option>
           <option value="travel">Travel</option>
           <option value="other">Other</option>
@@ -293,8 +240,8 @@ export const ViewExpense = () => {
             <tr>
               <th style={{ borderTopLeftRadius: 10 }}>Transaction Date</th>
               <th>Description</th>
-              {selectedTransactionType !== false && <th>Debit</th>}
-              {selectedTransactionType !== true && <th>Credit</th>}
+              {selectedTransactionType === true && <th>Debit</th>}
+              {selectedTransactionType === false && <th>Credit</th>}
               <th>Balance</th>
               <th>Category</th>
               <th style={{ borderTopRightRadius: 10 }}>Action</th>
@@ -302,62 +249,35 @@ export const ViewExpense = () => {
           </thead>
           <tbody>
             {transactions &&
-              transactions.map((transaction: Transaction, i: number) => (
-                <tr key={transaction.transactions._id}>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>
-                    {transaction.transactions.transactionDate}
-                  </td>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>
-                    {transaction.transactions.description}
-                  </td>
-                  {selectedTransactionType !== false && (
-                    <td className={i % 2 === 0 ? "debit" : "credit"}>
-                      {transaction.transactions.debit}
+              transactions.map((transaction: Transaction, i: number) => {
+                const isDebit = i % 2 === 0 ? "debit" : "credit";
+                const { transactionDate, description, debit, credit, balance, category, _id } =
+                  transaction.transactions;
+
+                return (
+                  <tr key={_id}>
+                    <td className={isDebit}>{transactionDate}</td>
+                    <td className={isDebit}>{description}</td>
+                    {selectedTransactionType === true && <td className={isDebit}>{debit}</td>}
+                    {selectedTransactionType === false && <td className={isDebit}>{credit}</td>}
+                    <td className={isDebit}>{balance}</td>
+                    <td className={isDebit}>{category}</td>
+                    <td className={isDebit}>
+                      <Button onClick={() => handleEditClick(transaction, _id)}>
+                        <EditIcon />
+                      </Button>
+                      <Button onClick={() => handleDeleteButton(transaction, _id)}>
+                        <DeleteIcon />
+                      </Button>
                     </td>
-                  )}
-                  {selectedTransactionType !== true && (
-                    <td className={i % 2 === 0 ? "debit" : "credit"}>
-                      {transaction.transactions.credit}
-                    </td>
-                  )}
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>
-                    {transaction.transactions.balance}
-                  </td>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>
-                    {transaction.transactions.category}
-                  </td>
-                  <td className={i % 2 === 0 ? "debit" : "credit"}>
-                    <Button
-                      onClick={() =>
-                        handleEditClick(
-                          transaction,
-                          transaction.transactions._id
-                        )
-                      }
-                    >
-                      <EditIcon />
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        handleDeleteButton(
-                          transaction,
-                          transaction.transactions._id
-                        );
-                      }}
-                    >
-                      <DeleteIcon />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
 
         <div className="pagination-controls">
-          <Button
-            onClick={() => handlePageChange(currentPage - 1)}
-            isDisabled={currentPage === 1}
-          >
+          <Button onClick={() => handlePageChange(currentPage - 1)} isDisabled={currentPage === 1}>
             {"<"}
           </Button>
           {Array.from({ length: totalPages }, (_, index) => (
@@ -365,17 +285,11 @@ export const ViewExpense = () => {
               key={index}
               onClick={() => handlePageChange(index + 1)}
               disabled={currentPage === index + 1}
-              className={
-                currentPage === index + 1 ? "currentPage" : "otherPage"
-              }
             >
               {index + 1}
             </Button>
           ))}
-          <Button
-            onClick={() => handlePageChange(currentPage + 1)}
-            isDisabled={currentPage === totalPages}
-          >
+          <Button onClick={() => handlePageChange(currentPage + 1)} isDisabled={currentPage === totalPages}>
             {">"}
           </Button>
         </div>
