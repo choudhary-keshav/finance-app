@@ -9,7 +9,6 @@ import "./ViewExpense.styled.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import TransactionModal from "../../pages/modals/TransactionModal";
 import TransactionDeleteModal from "../../pages/modals/TransactionDeleteModal";
-import { toast } from "react-toastify";
 
 export const ViewExpense = () => {
   const [deleteTransactionApi] = useDeleteTransactionApiMutation();
@@ -118,22 +117,30 @@ export const ViewExpense = () => {
       ...transactionFormData,
       [e.target.name]: e.target.value,
     });
+    setTimeout(()=>{
+      console.log(transactionFormData)
+    },500) 
   };
 
   const handleTransactionFormSubmit = async () => {
     try {
-      transactionFormData.transactionDate = DateTime.fromISO(
-        transactionFormData.transactionDate
-      ).toFormat("dd-MM-yyyy");
+      transactionFormData.transactionDate = DateTime.fromISO(transactionFormData.transactionDate).toFormat(
+        "dd-MM-yyyy"
+      );
+
       const response = await editTransactionApi({
         userId,
         transactionId,
         transactionFormData,
       }).unwrap();
 
+      console.log(response)
+
+      
       const updatedTransaction = response.transactions.find(
         (transaction: Transaction) => transaction._id === transactionId
       );
+
       setTransactions((prevTransactions) => {
         const newTransactions = prevTransactions.map((eachTransaction) => {
           if (eachTransaction.transactions._id === transactionId) {
@@ -224,8 +231,8 @@ export const ViewExpense = () => {
             <tr>
               <th style={{ borderTopLeftRadius: 10 }}>Transaction Date</th>
               <th>Description</th>
-              {selectedTransactionType === true && <th>Debit</th>}
-              {selectedTransactionType === false && <th>Credit</th>}
+              {selectedTransactionType !== false && <th>Debit</th>}
+              {selectedTransactionType !== true && <th>Credit</th>}
               <th>Balance</th>
               <th>Category</th>
               <th style={{ borderTopRightRadius: 10 }}>Action</th>
@@ -242,8 +249,8 @@ export const ViewExpense = () => {
                   <tr key={_id}>
                     <td className={isDebit}>{transactionDate}</td>
                     <td className={isDebit}>{description}</td>
-                    {selectedTransactionType === true && <td className={isDebit}>{debit}</td>}
-                    {selectedTransactionType === false && <td className={isDebit}>{credit}</td>}
+                    {selectedTransactionType !== false && <td className={isDebit}>{debit}</td>}
+                    {selectedTransactionType !== true && <td className={isDebit}>{credit}</td>}
                     <td className={isDebit}>{balance}</td>
                     <td className={isDebit}>{category}</td>
                     <td className={isDebit}>
@@ -271,6 +278,9 @@ export const ViewExpense = () => {
           ))}
           <Button onClick={() => handlePageChange(currentPage + 1)} isDisabled={currentPage === totalPages}>
             {">"}
+
+
+            
           </Button>
         </div>
       </div>
