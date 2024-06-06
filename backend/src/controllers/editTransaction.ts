@@ -2,9 +2,8 @@ import { Request, Response } from 'express';
 import { TransactionModel } from '../models/transactionModel';
 
 export const editTransaction = async (req: Request, res: Response) => {
-  console.log('Hello, I am here');
   const { userId, transactionId } = req.params;
-  console.log(userId, transactionId)
+  console.log(userId, transactionId);
   const { transactionDate, description, amount, type, balance, category } =
     req.body;
 

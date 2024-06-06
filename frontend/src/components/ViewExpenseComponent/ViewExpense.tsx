@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { DateTime } from "luxon";
 import { Stack } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
+import { useDeleteTransactionApiMutation } from "../../redux/services/deleteTransactionApi";
+import { useEditTransactionApiMutation } from "../../redux/services/editTransactionApi";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
 import { Transaction } from "../../interfaces/interface";
 import { Radio, RadioGroup, Button } from "@chakra-ui/react";
@@ -10,9 +11,10 @@ import "./ViewExpense.styled.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import TransactionModal from "../../pages/modals/TransactionModal";
 import TransactionDeleteModal from "../../pages/modals/TransactionDeleteModal";
-import { TransactionDetails } from "../../interfaces/interface";
 
 export const ViewExpense = () => {
+  const [deleteTransactionApi] = useDeleteTransactionApiMutation();
+  const [editTransactionApi] = useEditTransactionApiMutation();
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedTransactionType, setSelectedTransactionType] = useState<
@@ -148,38 +150,38 @@ export const ViewExpense = () => {
       transactionFormData.transactionDate = DateTime.fromISO(
         transactionFormData.transactionDate
       ).toFormat("dd-MM-yyyy");
-      const response = await axios.put(
-        `http://localhost:5000/api/editTransaction/${userId}/${transactionId}`,
-        transactionFormData
-      );
 
-      if (response.status === 200) {
-        const updatedTransaction = response.data.transactions[0];
+      const response = await editTransactionApi({
+        userId,
+        transactionId,
+        transactionFormData,
+      }).unwrap();
 
-        setTransactions((prevTransactions) => {
-          const newTransactions = prevTransactions.map((eachTransaction) => {
-            if (eachTransaction.transactions._id === transactionId) {
-              return {
-                ...eachTransaction,
-                transactions: {
-                  ...eachTransaction.transactions,
-                  description: updatedTransaction.description,
-                  debit: updatedTransaction.debit,
-                  credit: updatedTransaction.credit,
-                  transactionDate: updatedTransaction.transactionDate,
-                  balance: updatedTransaction.balance,
-                  category: updatedTransaction.category,
-                },
-              };
-            }
-            return eachTransaction;
-          });
+      const updatedTransaction = response.transactions[0];
 
-          return newTransactions;
+      setTransactions((prevTransactions) => {
+        const newTransactions = prevTransactions.map((eachTransaction) => {
+          if (eachTransaction.transactions._id === transactionId) {
+            return {
+              ...eachTransaction,
+              transactions: {
+                ...eachTransaction.transactions,
+                description: updatedTransaction.description,
+                debit: updatedTransaction.debit,
+                credit: updatedTransaction.credit,
+                transactionDate: updatedTransaction.transactionDate,
+                balance: updatedTransaction.balance,
+                category: updatedTransaction.category,
+              },
+            };
+          }
+          return eachTransaction;
         });
 
-        setIsModalOpen(false);
-      }
+        return newTransactions;
+      });
+
+      setIsModalOpen(false);
     } catch (error) {
       console.error("Error updating transaction:", error);
     }
@@ -200,26 +202,25 @@ export const ViewExpense = () => {
 
   const handleDelete = async (userId: string, transactionId: string) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/deleteTransaction/${userId}/${transactionId}`
+      const result = await deleteTransactionApi({
+        userId,
+        transactionId,
+      }).unwrap();
+
+      console.log(
+        "Transaction with ID",
+        transactionId,
+        "deleted successfully."
       );
 
-      if (response.status === 200) {
-        console.log(
-          "Transaction with ID",
-          transactionId,
-          "deleted successfully."
-        );
+      setTransactions((prevTransactions) =>
+        prevTransactions.filter(
+          (eachTransaction) =>
+            eachTransaction.transactions._id !== transactionId
+        )
+      );
 
-        setTransactions((prevTransactions) =>
-          prevTransactions.filter(
-            (eachTransaction) =>
-              eachTransaction.transactions._id !== transactionId
-          )
-        );
-
-        setIsDeleteModalOpen(false);
-      }
+      setIsDeleteModalOpen(false);
     } catch (error) {
       console.error(
         `Error deleting transaction with ID ${transactionId}:`,
@@ -227,7 +228,6 @@ export const ViewExpense = () => {
       );
     }
   };
-
   const handleCategoryNewTransaction = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {

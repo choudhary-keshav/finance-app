@@ -12,15 +12,9 @@ import {
   FormLabel,
   useDisclosure,
 } from "@chakra-ui/react";
-import {
-  // TransactionDetails,
-  TransactionFormData,
-  Transaction,
-} from "../../interfaces/interface";
-// import axios from "axios";
+import { TransactionFormData, Transaction } from "../../interfaces/interface";
 import { jwtDecode } from "jwt-decode";
 import TransactionModal from "../../pages/modals/TransactionModal";
-// import { isDisabled, isEditable } from "@testing-library/user-event/dist/utils";
 import "./UploadExcel.styled.css";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
 import { useSaveExcelDataMutation } from "../../redux/services/saveExcelApi";

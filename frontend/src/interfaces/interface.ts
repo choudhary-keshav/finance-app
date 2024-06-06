@@ -57,20 +57,6 @@ export interface TransactionDetails {
   _id: string;
 }
 
-// export interface Transaction {
-//   balance: number;
-//   category: string;
-
-//   description: string;
-//   debit: number;
-//   credit: number;
-//   transactionDate: string;
-//   _id: string;
-//   userId: string;
-//   transactions: TransactionDetails;
-//   __v: number;
-// }
-
 export interface UpdatedUser {
   _id: string;
   name: string;
