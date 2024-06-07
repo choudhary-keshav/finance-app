@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { User } from "../../interfaces/interface";
+import { User } from "../../utils/interfaces/interface";
 const config = {
   headers: {
     "Content-type": "application/json",

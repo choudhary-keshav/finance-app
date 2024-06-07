@@ -16,7 +16,8 @@ import {
   ModalFooter,
   Button,
 } from "@chakra-ui/react";
-import { TransactionModalProps } from "../../interfaces/interface";
+import { TransactionModalProps } from "../../utils/interfaces/interface";
+import { categories } from "../../utils/constants/constant";
 
 const TransactionModal: React.FC<TransactionModalProps> = ({
   totalBalance,
@@ -34,7 +35,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   }, [totalBalance]);
 
   useEffect(() => {
-    if(!isEditing){
+    if (!isEditing) {
       transactionFormData.balance = String(balance);
     }
   }, [balance, transactionFormData]);
@@ -46,7 +47,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
 
     if (Number(transactionFormData.amount)) {
       let newBalance;
-      const initialBalance = totalBalance ?? 0; 
+      const initialBalance = totalBalance ?? 0;
       if (value === "credit") {
         newBalance = initialBalance + Number(transactionFormData.amount);
       } else if (value === "debit") {
@@ -60,9 +61,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>
-          {isEditing ? "Edit Transaction" : "Add Transaction"}
-        </ModalHeader>
+        <ModalHeader>{isEditing ? "Edit Transaction" : "Add Transaction"}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <FormControl>
@@ -105,8 +104,12 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               onChange={(e) => handleTypeChange(e as unknown as string)}
             >
               <Stack direction="row">
-                <Radio value="debit" isDisabled={isEditing}>Debit</Radio>
-                <Radio value="credit" isDisabled={isEditing}>Credit</Radio>
+                <Radio value="debit" isDisabled={isEditing}>
+                  Debit
+                </Radio>
+                <Radio value="credit" isDisabled={isEditing}>
+                  Credit
+                </Radio>
               </Stack>
             </RadioGroup>
           </FormControl>
@@ -129,18 +132,16 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               onChange={handleCategoryNewTransaction}
               placeholder="Select category"
             >
-              <option value="food">Food</option>
-              <option value="travel">Travel</option>
-              <option value="other">Other</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
             </Select>
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Button
-            onClick={handleTransactionFormSubmit}
-            colorScheme="blue"
-            mr={3}
-          >
+          <Button onClick={handleTransactionFormSubmit} colorScheme="blue" mr={3}>
             {isEditing ? "Edit Transaction" : "Add Transaction"}
           </Button>
           <Button onClick={onClose}>Cancel</Button>

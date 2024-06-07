@@ -4,20 +4,16 @@ import { Table, Thead, Tbody, Tr, Th, Td, Box } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { DateTime } from "luxon";
-import {
-  Select,
-  Button,
-  Input,
-  FormControl,
-  FormLabel,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { TransactionFormData, Transaction } from "../../interfaces/interface";
+import { Select, Button, Input, FormControl, FormLabel, useDisclosure } from "@chakra-ui/react";
+import { TransactionFormData, Transaction } from "../../utils/interfaces/interface";
 import { jwtDecode } from "jwt-decode";
 import TransactionModal from "../../pages/modals/TransactionModal";
 import "./UploadExcel.styled.css";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
 import { useSaveExcelDataMutation } from "../../redux/services/saveExcelApi";
+import { initialTransactionFormData } from "../../utils/constants/constant";
+import strings from "../../utils/strings/string.json";
+import { categories } from "../../utils/constants/constant";
 
 const UploadExcel: React.FC = () => {
   const [excelData, setExcelData] = useState<(string | null | undefined)[][]>([]);
@@ -25,14 +21,7 @@ const UploadExcel: React.FC = () => {
   const [isFileUploaded, setIsFileUploaded] = useState<boolean>(false);
   const [totalBalance, setTotalBalance] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [transactionFormData, setTransactionFormData] = useState<TransactionFormData>({
-    transactionDate: "",
-    description: "",
-    amount: "",
-    type: "",
-    balance: "",
-    category: "",
-  });
+  const [transactionFormData, setTransactionFormData] = useState<TransactionFormData>(initialTransactionFormData);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [trigger] = useLazyViewTransactionQuery();
@@ -79,7 +68,7 @@ const UploadExcel: React.FC = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
-      toast.error("Please choose the file")
+      toast.error(strings.uploadExcel.pleaseChooseFile);
       return;
     }
 
@@ -93,7 +82,7 @@ const UploadExcel: React.FC = () => {
     const isValidFile = validMimeTypes.includes(file.type) && validExtensions.includes(fileExtension);
 
     if (!isValidFile) {
-      toast.error("Please upload a valid Excel file ('.xls' or '.xlsx').");
+      toast.error(strings.uploadExcel.invalidExcelFile);
       return;
     }
 
@@ -115,7 +104,7 @@ const UploadExcel: React.FC = () => {
           row.map((cell, index) => (index === 0 ? serialNumberToDate(Number(cell || 0)) : cell || ""))
         );
       if (filteredData.length <= 1) {
-        toast.error("The uploaded file is empty or contains no valid data.");
+        toast.error(strings.uploadExcel.fileIsEmpty);
         setIsFileUploaded(false);
         return;
       }
@@ -142,7 +131,7 @@ const UploadExcel: React.FC = () => {
 
   const handleTransactionFormSubmit = async () => {
     if (!transactionFormData.transactionDate || !transactionFormData.description) {
-      toast.error("Enter transaction date and description");
+      toast.error(strings.uploadExcel.enterTransactionDateDescription);
       return;
     }
 
@@ -181,28 +170,25 @@ const UploadExcel: React.FC = () => {
       } = jwtDecode(userInfoString || "");
 
       if (!userInfoString) {
-        console.error("User information not found in local storage");
+        toast.error(strings.uploadExcel.enterTransactionDateDescription);
         return;
       }
 
       if (!decodedToken.payload._id) {
-        console.error("User information invalid or missing _id");
+        console.error(strings.uploadExcel.userIdMissing);
         return;
       }
 
       const userId = decodedToken.payload._id;
-
       const response = await saveExcelData({
         excelData: updatedExcelData,
         selectedCategories,
         userId,
       }).unwrap();
-      console.log(response, "response");
-      toast.success("Transaction added successfully");
-      console.log("Data saved:", response);
+      toast.success(strings.uploadExcel.transactionAddedSuccess);
     } catch (error) {
-      toast.error("Error saving data");
-      console.error("Error saving data:", error);
+      toast.error(strings.uploadExcel.errorSavingData);
+      console.error(strings.uploadExcel.errorSavingData, error);
     }
     setExcelData([]);
     onClose();
@@ -221,34 +207,29 @@ const UploadExcel: React.FC = () => {
       } = jwtDecode(userInfoString || "");
 
       if (!userInfoString) {
-        console.error("User information not found in local storage");
+        console.error(strings.uploadExcel.userInfoNotFound);
         return;
       }
-
       if (!decodedToken.payload._id) {
-        console.error("User information invalid or missing _id");
+        console.error(strings.uploadExcel.userInfoNotFound);
         return;
       }
-
       const userId = decodedToken.payload._id;
-
-      const response = await saveExcelData({
+      await saveExcelData({
         excelData,
         selectedCategories,
         userId,
       }).unwrap();
-      toast.success("Data saved successfully");
-      console.log("Data saved:", response);
+      toast.success(strings.uploadExcel.dataSavedSuccess);
       setExcelData([]);
     } catch (error) {
-      toast.error("Error saving data");
-      console.error("Error saving data:", error);
+      toast.error(strings.uploadExcel.errorSavingData);
+      console.error(strings.uploadExcel.errorSavingData, error);
     }
   };
 
   const handleCategoryNewTransaction = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     handleTransactionFormChange(e);
-    console.log(e.target.value);
     handleCategoryChange(excelData.length, e.target.value);
   };
 
@@ -305,9 +286,11 @@ const UploadExcel: React.FC = () => {
                           onChange={(e) => handleCategoryChange(rowIndex, e.target.value)}
                           placeholder="Select category"
                         >
-                          <option value="Food">Food</option>
-                          <option value="travel">Travel</option>
-                          <option value="other">Other</option>
+                          {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </option>
+                          ))}
                         </Select>
                       )}
                     </Td>

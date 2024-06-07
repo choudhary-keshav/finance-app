@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { UpdatedUser } from "../../interfaces/interface";
-import { PieData } from "../../interfaces/transaction";
+import { UpdatedUser } from "../../utils/interfaces/interface";
 export const updateUserApi = createApi({
   reducerPath: "transactionApi",
   baseQuery: fetchBaseQuery({

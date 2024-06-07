@@ -4,7 +4,6 @@ import { COLUMNS } from "./columns";
 import "./styles.css";
 
 export const Table = ({ givenData }) => {
-  console.log(givenData);
   const [currentPage, setCurrentPage] = useState(1);
   const maxButtons = [-3, -2, -1, 0, 1, 2, 3];
   const columns = useMemo(() => COLUMNS, []);

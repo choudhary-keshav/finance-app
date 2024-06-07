@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, useColorModeValue, useDisclosure } from "@chakra-ui/react";
-import { ProfilePageProps } from "../../interfaces/interface";
+import { ProfilePageProps } from "../../utils/interfaces/interface";
 import SidebarWithHeader from "./SidebarWithHeader";
 import AllRoutes from "../../AllRoutes";
 

@@ -8,10 +8,9 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { FiTrendingUp, FiCompass, FiStar, FiSettings } from "react-icons/fi";
-import { LinkItemProps } from "../../interfaces/interface";
+import { LinkItemProps } from "../../utils/interfaces/interface";
 import NavItem from "./NavItem";
-import logoImg from "../../assets/images/download-removebg-preview.png";
-import { NavLink } from "react-router-dom";
+import logoImg from "../../utils/images/download-removebg-preview.png";
 
 const LinkItems: Array<LinkItemProps> = [
   { name: "Dashboard", icon: FiSettings, to: "/" },

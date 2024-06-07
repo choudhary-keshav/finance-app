@@ -3,14 +3,11 @@ import { TransactionModel } from '../models/transactionModel';
 
 export const editTransaction = async (req: Request, res: Response) => {
   const { userId, transactionId } = req.params;
-  console.log(userId, transactionId);
   const { transactionDate, description, amount, type, balance, category } =
     req.body;
 
   let debit = '';
   let credit = '';
-
-  console.log(req.body);
 
   try {
     if (!transactionId) {

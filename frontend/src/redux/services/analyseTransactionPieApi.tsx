@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Transaction } from "../../interfaces/interface";
-import { PieData } from "../../interfaces/transaction";
+import { Transaction } from "../../utils/interfaces/interface";
+import { PieData } from "../../utils/interfaces/transaction";
 export const transactionApi = createApi({
   reducerPath: "transactionApi",
   baseQuery: fetchBaseQuery({

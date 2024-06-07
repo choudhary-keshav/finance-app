@@ -129,3 +129,14 @@ export interface TransactionModalProps {
   ) => void;
   isEditing: boolean;
 }
+export interface SaveExcelDataRequest {
+  excelData: any[]; 
+  selectedCategories: string[];
+  userId: string;
+}
+
+export interface SaveExcelDataResponse {
+  success: boolean;
+  message: string;
+}
+
