@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DateTime } from "luxon";
+import "react-toastify/dist/ReactToastify.css";
 import { Stack, Select, Radio, RadioGroup, Button } from "@chakra-ui/react";
 import { useDeleteTransactionApiMutation } from "../../redux/services/deleteTransactionApi";
 import { useEditTransactionApiMutation } from "../../redux/services/editTransactionApi";
@@ -9,7 +10,7 @@ import "./ViewExpense.styled.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import TransactionModal from "../../pages/modals/TransactionModal";
 import TransactionDeleteModal from "../../pages/modals/TransactionDeleteModal";
-import { dateOptions , categories,initialTransactionFormData} from "../../utils/constants/constant";
+import { dateOptions, categories, initialTransactionFormData } from "../../utils/constants/constant";
 
 export const ViewExpense = () => {
   const [deleteTransactionApi] = useDeleteTransactionApiMutation();
@@ -27,7 +28,7 @@ export const ViewExpense = () => {
   const [userId, setUserId] = useState<string>();
   const [transactionId, setTransactionId] = useState<string>();
 
-  const [transactionFormData, setTransactionFormData] = useState(initialTransactionFormData)
+  const [transactionFormData, setTransactionFormData] = useState(initialTransactionFormData);
   const formatDate = (date: string) => {
     const d = new Date(date);
     const day = `0${d.getDate()}`.slice(-2);
@@ -109,6 +110,9 @@ export const ViewExpense = () => {
       ...transactionFormData,
       [e.target.name]: e.target.value,
     });
+    setTimeout(() => {
+      console.log(transactionFormData);
+    }, 500);
   };
 
   const handleTransactionFormSubmit = async () => {
@@ -122,6 +126,8 @@ export const ViewExpense = () => {
         transactionId,
         transactionFormData,
       }).unwrap();
+
+      console.log(response);
 
       const updatedTransaction = response.transactions.find(
         (transaction: Transaction) => transaction._id === transactionId
