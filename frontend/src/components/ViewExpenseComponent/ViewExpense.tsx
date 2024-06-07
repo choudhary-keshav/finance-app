@@ -4,11 +4,12 @@ import { Stack, Select, Radio, RadioGroup, Button } from "@chakra-ui/react";
 import { useDeleteTransactionApiMutation } from "../../redux/services/deleteTransactionApi";
 import { useEditTransactionApiMutation } from "../../redux/services/editTransactionApi";
 import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi";
-import { Transaction } from "../../interfaces/interface";
+import { Transaction } from "../../utils/interfaces/interface";
 import "./ViewExpense.styled.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import TransactionModal from "../../pages/modals/TransactionModal";
 import TransactionDeleteModal from "../../pages/modals/TransactionDeleteModal";
+import { dateOptions , categories,initialTransactionFormData} from "../../utils/constants/constant";
 
 export const ViewExpense = () => {
   const [deleteTransactionApi] = useDeleteTransactionApiMutation();
@@ -25,17 +26,8 @@ export const ViewExpense = () => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [userId, setUserId] = useState<string>();
   const [transactionId, setTransactionId] = useState<string>();
-  const [transactionFormData, setTransactionFormData] = useState({
-    userId: "",
-    transactionId: "",
-    transactionDate: "",
-    description: "",
-    amount: "",
-    type: "",
-    balance: "",
-    category: "",
-  });
 
+  const [transactionFormData, setTransactionFormData] = useState(initialTransactionFormData)
   const formatDate = (date: string) => {
     const d = new Date(date);
     const day = `0${d.getDate()}`.slice(-2);
@@ -117,9 +109,6 @@ export const ViewExpense = () => {
       ...transactionFormData,
       [e.target.name]: e.target.value,
     });
-    setTimeout(()=>{
-      console.log(transactionFormData)
-    },500) 
   };
 
   const handleTransactionFormSubmit = async () => {
@@ -134,9 +123,6 @@ export const ViewExpense = () => {
         transactionFormData,
       }).unwrap();
 
-      console.log(response)
-
-      
       const updatedTransaction = response.transactions.find(
         (transaction: Transaction) => transaction._id === transactionId
       );
@@ -178,7 +164,6 @@ export const ViewExpense = () => {
   const handleDelete = async (userId: string, transactionId: string) => {
     try {
       await deleteTransactionApi({ userId, transactionId }).unwrap();
-      console.log(`Transaction with ID ${transactionId} deleted successfully.`);
       setTransactions((prevTransactions) =>
         prevTransactions.filter((transaction) => transaction.transactions._id !== transactionId)
       );
@@ -201,10 +186,11 @@ export const ViewExpense = () => {
     <div className="viewExpense-main-container">
       <div className="viewExpense-sub-container">
         <Select value={selectedOption} onChange={handleSelectChange} placeholder="All" width="250px">
-          <option value="thisWeek">This Week</option>
-          <option value="thisMonth">This Month</option>
-          <option value="thisYear">This Year</option>
-          <option value="custom">Custom</option>
+          {dateOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </Select>
         {selectedOption === "custom" && (
           <>
@@ -213,9 +199,11 @@ export const ViewExpense = () => {
           </>
         )}
         <Select value={selectedCategory} onChange={handleCategoryChange} placeholder="All" width="250px">
-          <option value="Food">Food</option>
-          <option value="travel">Travel</option>
-          <option value="other">Other</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
         </Select>
         <RadioGroup onChange={handleTransactionTypeChange}>
           <Stack direction="row">
@@ -278,9 +266,6 @@ export const ViewExpense = () => {
           ))}
           <Button onClick={() => handlePageChange(currentPage + 1)} isDisabled={currentPage === totalPages}>
             {">"}
-
-
-            
           </Button>
         </div>
       </div>

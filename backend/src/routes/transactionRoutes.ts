@@ -1,5 +1,5 @@
 import express from 'express';
-import { getTransactions } from '../controllers/getTransactionController';
+import { getTransactions } from '../controllers/transactionController';
 import { editTransaction } from '../controllers/editTransaction';
 import { deleteTransaction } from '../controllers/deleteTransaction';
 const authenticateToken = require('../middleware/authenticationMiddleware');

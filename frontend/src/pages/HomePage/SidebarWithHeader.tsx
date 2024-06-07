@@ -1,5 +1,5 @@
 import React from "react";
-import { SidebarWithHeaderProps } from "../../interfaces/interface";
+import { SidebarWithHeaderProps } from "../../utils/interfaces/interface";
 import { Drawer, DrawerContent } from "@chakra-ui/react";
 import SidebarContent from "./SidebarContent";
 import MobileNav from "./MobileNav";

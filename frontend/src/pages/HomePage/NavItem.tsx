@@ -1,6 +1,6 @@
 import React from "react";
 import { Flex, Icon } from "@chakra-ui/react";
-import { NavItemProps } from "../../interfaces/interface";
+import { NavItemProps } from "../../utils/interfaces/interface";
 import { Link } from "react-router-dom";
 
 const NavItem: React.FC<NavItemProps> = ({ icon, children, to }) => {

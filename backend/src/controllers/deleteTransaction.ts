@@ -2,9 +2,7 @@ import { Request, Response } from 'express';
 import { TransactionModel } from '../models/transactionModel';
 
 export const deleteTransaction = async (req: Request, res: Response) => {
-  console.log('i am delete backennd');
   const { userId, transactionId } = req.params;
-  console.log(userId, transactionId);
   try {
     if (!transactionId) {
       return res.status(400).json({ error: 'Transaction ID is required' });

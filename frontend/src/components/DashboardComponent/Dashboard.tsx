@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Box, Heading, Text, useToast } from "@chakra-ui/react";
-import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi"; // Adjust the import path as necessary
+import { Box, Heading, Text } from "@chakra-ui/react";
+import { useLazyViewTransactionQuery } from "../../redux/services/viewTransactionApi"; 
 import "./Dashboard.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { Transaction } from "../../interfaces/interface";
+import { Transaction } from "../../utils/interfaces/interface";
 
 const Dashboard: React.FC = () => {
   const [totalExpenses, setTotalExpenses] = useState<number>(0);
@@ -31,6 +31,7 @@ const Dashboard: React.FC = () => {
           const data: any = response.data;
           const transactions: Transaction[] = data.transactions;
 
+          // eslint-disable-next-line no-loop-func
           transactions.map((transaction) => {
             const { debit, balance } = transaction.transactions;
             if (debit) {
@@ -39,7 +40,6 @@ const Dashboard: React.FC = () => {
             latestBalance = parseFloat(balance);
           });
         }
-
         setTotalExpenses(calculatedExpenses);
         setTotalBalance(latestBalance);
       } catch (err) {
